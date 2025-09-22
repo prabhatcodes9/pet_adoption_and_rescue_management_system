@@ -1,1 +1,4 @@
 # pet_adoptation_rescue_management_infosysProject
+
+The "PetRescue" project aims to develop an interactive web platform that bridges the gap between individuals who find lost pets and their owners. The website will provide functionalities for users to raise requests regarding found pets, while admins can view and manage these requests to facilitate reunions. The platform will also allow users to check whether their lost pets have been reported on the website, thereby enhancing the chances of a reunion. The intuitive interface and structured data management will ensure a seamless experience for both users and admins.
+The outcomes include a fully functional website built with HTML, CSS, Flask, and MySQL, designed to support users and administrators. This platform will enhance pet recovery efforts, making it easier for pet owners to locate their pets and for finders to report them
