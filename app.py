@@ -40,7 +40,7 @@ def register():
         mobile = request.form.get('mobile')
         email = request.form.get('email')
         address = request.form.get('address')
-        password = bcrypt.generate_password_hash(request.form.get['password']).decode('utf-8')
+        password = bcrypt.generate_password_hash(request.form.get('password')).decode('utf-8')
 
         user = User(name=name, email=email, password=password)
         db.session.add(user)
