@@ -19,9 +19,9 @@ login_manager.login_view = 'login'
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    mobile = db.Column(db.String(15), nullable=False)
+    mobile = db.Column(db.String(15), nullable=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    address = db.Column(db.String(255), nullable=False)
+    address = db.Column(db.String(255), nullable=True)
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(20), default="user")
 
@@ -37,12 +37,18 @@ def home():
 def register():
     if request.method == 'POST':
         name = request.form.get('name')
-        mobile = request.form.get('mobile')
+        mobile = request.form.get('mobile') or 'N/A'
         email = request.form.get('email')
-        address = request.form.get('address')
+        address = request.form.get('address') or 'N/A'
         password = bcrypt.generate_password_hash(request.form.get('password')).decode('utf-8')
 
-        user = User(name=name, email=email, password=password)
+        user = User(
+            name=name,
+            mobile=mobile,     
+            email=email,
+            address=address,   
+            password=password
+        )
         db.session.add(user)
         db.session.commit()
 
@@ -50,6 +56,7 @@ def register():
         return redirect(url_for('login'))
     
     return render_template('register.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

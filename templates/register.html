@@ -5,14 +5,14 @@
 </head>
 <body>
   <h2>Create Account</h2>
-  <form method="POST">
-    <input type="text" name="name" placeholder="Full Name" required><br>
-    <input type="text" name="mobile" placeholder="Mobile Number" required><br>
-    <input type="email" name="email" placeholder="Email" required><br>
-    <input type="text" name="address" placeholder="Address" required><br>
-    <input type="password" name="password" placeholder="Password" required><br>
+  <form action="/register" method="POST">
+    <input type="text" name="name" placeholder="Full Name" required>
+    <input type="text" name="mobile" placeholder="Mobile Number" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="text" name="address" placeholder="Address" required>
+    <input type="password" name="password" placeholder="Password" required>
     <button type="submit">Register</button>
-  </form>
+</form>
   <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
 </body>
 </html>

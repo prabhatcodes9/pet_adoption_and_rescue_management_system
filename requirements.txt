@@ -3,3 +3,4 @@ flask-sqlalchemy
 flask-bcrypt
 flask-lohin 
 pymysql
+flask-wtf
