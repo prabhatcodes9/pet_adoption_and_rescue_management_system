@@ -1,6 +1,6 @@
 flask 
-flask-sqlalchemy
-flask-bcrypt
+flask-sqlalchemy 
+flask-bcrypt 
 flask-lohin 
-pymysql
+pymysql 
 flask-wtf

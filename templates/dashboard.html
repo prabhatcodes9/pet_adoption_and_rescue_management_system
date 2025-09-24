@@ -4,7 +4,7 @@
   <title>Dashboard</title>
 </head>
 <body>
-  <h2>Welcome, {{ name }}!</h2>
-  <a href="{{ url_for('logout') }}">Logout</a>
+  <h2>Welcome, {{ user.name }}!</h2>
+<a href="{{ url_for('logout') }}">Logout</a>
 </body>
 </html>

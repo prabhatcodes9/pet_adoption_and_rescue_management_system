@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pet Adoption and Rescue Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+      color: #1a2b49;
+    }
+
+    /* Navbar */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      background-color: #ffffff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header h1 {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 0;
+      color: #1a2b49;
+    }
+
+    header .login-btn {
+      padding: 8px 18px;
+      border: 1px solid #1a2b49;
+      background: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    header .login-btn:hover {
+      background: #1a2b49;
+      color: white;
+    }
+
+    /* Hero Section */
+    .hero {
+      display: flex;
+      flex-direction: column; /* stack text/buttons in center */
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 20px;
+      
+      /* Background image */
+      background: url("{{ url_for('static', filename='images/how-to-walk-multiple-dogs-like-a-professional-dog-walker.png') }}") no-repeat center center/cover;
+      
+      min-height: 100vh;
+      color: white;
+      position: relative;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);  /* dark overlay for readability */
+    }
+    .hero-text {
+      position: relative; /* keep above overlay */
+      max-width: 700px;
+      z-index: 1;
+    }
+
+    .hero-text h2 {
+      font-size: 42px;
+      margin-bottom: 20px;
+    }
+
+    .hero-text p {
+      font-size: 20px;
+      margin-bottom: 30px;
+    }
+
+
+    /* Buttons */
+    .buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .buttons button {
+      flex: 1;
+      min-width: 150px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+      transition: 0.3s;
+    }
+
+    .lost-found { background: #1a2b49; }
+    .adopt { background: #2b7a78; }
+    .report { background: #3b82f6; }
+
+    .buttons button:hover {
+      opacity: 0.85;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+      }
+      .hero img {
+        margin: 0 0 20px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>Pet Adoption and Rescue Management</h1>
+    <a href="{{ url_for('login') }}">
+    <button class="login-btn">Login</button>
+    </a>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <img src="{{ url_for('static', filename='images/how-to-walk-multiple-dogs-like-a-professional-dog-walker.png') }}" 
+     alt="Dog Walking" width="400">
+    <div class="hero-text">
+      <h2>Love is a four-legged word</h2>
+      <p>Adopt a pet and give them a loving home. Help us save pets in need by adopting or giving them a foster home.</p>
+      <div class="buttons">
+        <button class="lost-found">Lost &amp; Found</button>
+        <button class="adopt">Adopt</button>
+        <button class="report">Report a rescue or Found</button>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

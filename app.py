@@ -25,12 +25,16 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(20), default="user")
 
+@app.route('/')
+def home():
+    return render_template('index.html')
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.route('/')
-def home():
+@app.route('/login')
+def login1():
     return render_template('login.html')
 
 @app.route('/register', methods=['POST', 'GET'])
@@ -71,7 +75,7 @@ def login():
             if user.role == 'admin':
                 return redirect(url_for('admin_dashboard'))
             else:
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('user_dashboard'))
         else:
             flash('Invalid credentials!')
 
@@ -91,7 +95,7 @@ def admin_dashboard():
     if current_user.role != "admin":
         flash("Access denied!", "danger")
         return redirect(url_for('login'))
-    return render_template('admin_dashboard.html', user=current_user)
+    return render_template('dashboard.html', user=current_user)
 
 @app.route('/logout')
 @login_required
@@ -99,3 +103,20 @@ def logout():
     logout_user()
     flash("You have logged out.", "info")
     return redirect(url_for('login'))
+
+with app.app_context():
+    admin_email = "admin@petrescue.com"
+    admin = User.query.filter_by(email=admin_email).first()
+    if not admin:
+        hashed_password = bcrypt.generate_password_hash("admin123").decode('utf-8')
+        admin_user = User(
+            name="Administrator",
+            mobile="N/A",
+            email=admin_email,
+            address="Head Office",
+            password=hashed_password,
+            role="admin"
+        )
+        db.session.add(admin_user)
+        db.session.commit()
+        print("✅ Admin user created: admin@petrescue.com / admin123")
