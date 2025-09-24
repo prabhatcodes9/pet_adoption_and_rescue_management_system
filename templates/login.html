@@ -16,9 +16,10 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
+            margin: 0;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 100px 20px 20px;
         }
 
         .container {
@@ -229,9 +230,51 @@
             border: 1px solid #f5c6cb;
             display: none;
         }
+        /* Navbar */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        header h1 {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+            color: #1a2b49;
+        }
+
+        header .login-btn {
+            padding: 8px 18px;
+            border: 1px solid #1a2b49;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        header .login-btn:hover {
+            background: #1a2b49;
+            color: white;
+        }
     </style>
 </head>
 <body>
+    <header>
+    <h1>Pet Adoption and Rescue Management</h1>
+    <a href="{{ url_for('home') }}">
+    <button class="login-btn">Home</button>
+    </a>
+    </header>
     <div class="container">
         <div class="header">
             <h1>🐾 Welcome Back</h1>
