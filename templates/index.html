@@ -1,156 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pet Adoption and Rescue Management</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
-      color: #1a2b49;
-    }
-
-    /* Navbar */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 40px;
-      background-color: #ffffff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    header h1 {
-      font-size: 20px;
-      font-weight: bold;
-      margin: 0;
-      color: #1a2b49;
-    }
-
-    header .login-btn {
-      padding: 8px 18px;
-      border: 1px solid #1a2b49;
-      background: white;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.3s ease;
-    }
-
-    header .login-btn:hover {
-      background: #1a2b49;
-      color: white;
-    }
-
-    /* Hero Section */
-    .hero {
-      display: flex;
-      flex-direction: column; /* stack text/buttons in center */
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 60px 20px;
-      
-      /* Background image */
-      background: url("{{ url_for('static', filename='images/how-to-walk-multiple-dogs-like-a-professional-dog-walker.png') }}") no-repeat center center/cover;
-      
-      min-height: 100vh;
-      color: white;
-      position: relative;
-    }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.5);  /* dark overlay for readability */
-    }
-    .hero-text {
-      position: relative; /* keep above overlay */
-      max-width: 700px;
-      z-index: 1;
-    }
-
-    .hero-text h2 {
-      font-size: 42px;
-      margin-bottom: 20px;
-    }
-
-    .hero-text p {
-      font-size: 20px;
-      margin-bottom: 30px;
-    }
-
-
-    /* Buttons */
-    .buttons {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-
-    .buttons button {
-      flex: 1;
-      min-width: 150px;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      color: white;
-      transition: 0.3s;
-    }
-
-    .lost-found { background: #1a2b49; }
-    .adopt { background: #2b7a78; }
-    .report { background: #3b82f6; }
-
-    .buttons button:hover {
-      opacity: 0.85;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .hero {
-        flex-direction: column;
-        text-align: center;
-      }
-      .hero img {
-        margin: 0 0 20px 0;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetConnect - Find Your Perfect Pet Companion</title>
+    <meta name="description" content="Connect with loving pets in need of homes. Find lost pets, report found animals, and discover your perfect pet companion through our adoption services.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🐾</span>
+                    <h1 class="logo-text">PetConnect</h1>
+                </div>
+                <button class="btn btn-primary" id="loginBtn" data-testid="button-login">Login</button>
+            </div>
+        </div>
+    </header>
 
-  <!-- Header -->
-  <header>
-    <h1>Pet Adoption and Rescue Management</h1>
-    <a href="{{ url_for('login') }}">
-    <button class="login-btn">Login</button>
-    </a>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="hero">
-    <img src="{{ url_for('static', filename='images/how-to-walk-multiple-dogs-like-a-professional-dog-walker.png') }}" 
-     alt="Dog Walking" width="400">
-    <div class="hero-text">
-      <h2>Love is a four-legged word</h2>
-      <p>Adopt a pet and give them a loving home. Help us save pets in need by adopting or giving them a foster home.</p>
-      <div class="buttons">
-        <button class="lost-found">Lost &amp; Found</button>
-        <button class="adopt">Adopt</button>
-        <button class="report">Report a rescue or Found</button>
-      </div>
+    <!-- Pet Gallery Section -->
+    <section class="pet-gallery">
+        <div class="container">
+            <div class="section-header">
+                <h2>Meet Our Adorable Friends</h2>
+                <p>These loving pets are waiting for their forever homes. Each one has a unique personality and is ready to become a cherished member of your family.</p>
+            </div>
+            
+            <div class="pet-grid">
+                <div class="pet-card" data-testid="card-pet-1">
+                    <div class="pet-image">
+                        <div class="placeholder-image">🐕</div>
+                    </div>
+                    <div class="pet-info">
+                        <h3>Buddy</h3>
+                        <p>This loving golden retriever is looking for a family to call his own. Buddy loves playing fetch and giving cuddles.</p>
+                    </div>
+                </div>
+                
+                <div class="pet-card" data-testid="card-pet-2">
+                    <div class="pet-image">
+                        <div class="placeholder-image">🐱</div>
+                    </div>
+                    <div class="pet-info">
+                        <h3>Whiskers</h3>
+                        <p>A gentle gray tabby who enjoys quiet afternoons by the window. Whiskers would be perfect for a calm, loving home.</p>
+                    </div>
+                </div>
+                
+                <div class="pet-card" data-testid="card-pet-3">
+                    <div class="pet-image">
+                        <div class="placeholder-image">🐕‍🦺</div>
+                    </div>
+                    <div class="pet-info">
+                        <h3>Scout</h3>
+                        <p>An energetic border collie ready for adventure! Scout needs an active family who loves outdoor activities.</p>
+                    </div>
+                </div>
+                
+                <div class="pet-card" data-testid="card-pet-4">
+                    <div class="pet-image">
+                        <div class="placeholder-image">🐈</div>
+                    </div>
+                    <div class="pet-info">
+                        <h3>Mango</h3>
+                        <p>This playful orange kitten is full of energy and love. Mango will bring joy and laughter to your home.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal" data-testid="modal-login">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Welcome Back</h2>
+                <span class="close" id="closeLogin">&times;</span>
+            </div>
+            
+            <form id="loginForm" method="POST" action="{{ url_for('login') }}" class='modal-form' onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required data-testid="input-password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="adminCode">Admin Code (Optional)</label>
+                    <input type="password" id="adminCode" name="adminCode" placeholder="Enter admin code if applicable" data-testid="input-admin-code">
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full" data-testid="button-submit-login">Login</button>
+            </form>
+            
+            <div class="modal-footer">
+                <p>Don't have an account? <a href="{{ url_for('home', show_register=1) }}">Register here</a></p>
+            </div>
+        </div>
     </div>
-  </section>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal" data-testid="modal-register">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Join PetConnect</h2>
+                <span class="close" id="closeRegister">&times;</span>
+            </div>
+            <form id="registrationForm" class="modal-form" action="{{ url_for('register') }}" method="POST" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name" required data-testid="input-name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="mobile">Mobile Number</label>
+                    <input type="tel" id="mobile" name="mobile" placeholder="Enter your mobile number" required data-testid="input-mobile">
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" name="address" placeholder="Enter your address" required data-testid="input-address">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email address" required data-testid="input-email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Create a strong password" required data-testid="input-password-register">
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full" data-testid="button-submit-register">Register</button>
+            </form>
+            
+            <div class="modal-footer">
+                <p>Already have an account? <a href="{{ url_for('home', show_login=1) }}">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 </body>
 </html>

@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../../Downloads/petconnect-html-css-js"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Pet_adoptation_project"
+	}
+}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pet Adoption and Rescue Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #1a2b49;
+    }
+
+    /* Navbar */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      background-color: #ffffff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header h1 {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 0;
+      color: #1a2b49;
+    }
+
+    /* Button container */
+    .nav-buttons {
+      display: flex;
+      gap: 10px; /* spacing between buttons */
+    }
+
+    .login-btn {
+      padding: 8px 18px;
+      border: 1px solid #1a2b49;
+      background: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      text-decoration: none; /* removes underline for links */
+      color: #1a2b49;
+    }
+
+    .login-btn:hover {
+      background: #1a2b49;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>Welcome {{ user.name }}</h1>
+    <div class="nav-buttons">
+      <a href="{{ url_for('login') }}" class="login-btn">My Lost request</a>
+      <a href="{{ url_for('login') }}" class="login-btn">Logout</a>
+    </div>
+  </header>
+  <!-- Main Content -->
+</body>
+</html>

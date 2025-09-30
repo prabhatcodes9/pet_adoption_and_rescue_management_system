@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Dashboard Header -->
+        <header class="dashboard-header">
+            <h1>Pet Admin Dashboard</h1>
+            <p>Manage pet requests and update their status</p>
+        </header>
+
+        <!-- Main Dashboard View -->
+        <div id="dashboard-view" class="dashboard-content">
+            <div class="action-buttons">
+                <button class="action-btn lost-btn" data-type="lost">
+                    <div class="btn-content">
+                        <h3>Lost</h3>
+                        <span class="count" id="lost-count">0</span>
+                    </div>
+                </button>
+                
+                <button class="action-btn found-btn" data-type="found">
+                    <div class="btn-content">
+                        <h3>Found</h3>
+                        <span class="count" id="found-count">0</span>
+                    </div>
+                </button>
+                
+                <button class="action-btn adopt-btn" data-type="adopt">
+                    <div class="btn-content">
+                        <h3>Adopt</h3>
+                        <span class="count" id="adopt-count">0</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Pet Details View -->
+        <div id="details-view" class="details-content hidden">
+            <div class="details-header">
+                <button id="back-btn" class="back-btn">← Back to Dashboard</button>
+                <h2 id="details-title">Pet Requests</h2>
+            </div>
+            
+            <div id="pet-list" class="pet-list">
+                <!-- Pet items will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
