@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from datetime import datetime
 import os
+from flask import jsonify
 
 app = Flask(__name__)
 app.secret_key = 'my-secret-key'
@@ -39,6 +40,7 @@ class LostPet(db.Model):
     mobile = db.Column(db.String(15))
     gender = db.Column(db.String(10))
     image = db.Column(db.String(255))
+    status = db.Column(db.String(20), default="pending")
 
 @app.route('/')
 def home():
@@ -117,7 +119,114 @@ def admin_dashboard():
     if current_user.role != "admin":
         flash("Access denied!", "danger")
         return redirect(url_for('login'))
-    return render_template('admin_dashboard.html', user=current_user)
+    
+    lost_count = LostPet.query.count()
+    found_count = 0  # Placeholder for FoundPet model
+    adopt_count = 0  # Placeholder for AdoptPet model
+
+    return render_template('admin_dashboard.html', user=current_user, lost_count=lost_count, found_count=found_count, adopt_count=adopt_count)
+
+@app.route('/admin/get_pets/<pet_type>')
+@login_required
+def get_pets(pet_type):
+    if current_user.role != "admin":
+        return jsonify({"error": "Access denied"}), 403
+
+    # Currently, we only have lost pets implemented
+    if pet_type == "lost":
+        pets = LostPet.query.all()
+        pet_data = [{
+            "id": pet.id,
+            "name": pet.pet_name,
+            "breed": pet.breed,
+            "description": pet.description,
+            "image": pet.image,
+            "gender": pet.gender,
+            "pet_type": pet.pet_type,
+            "date_lost": pet.date_lost.strftime('%Y-%m-%d') if pet.date_lost else None,
+            "mobile": pet.mobile
+        } for pet in pets]
+        return jsonify(pet_data)
+    
+    return jsonify([])
+
+@app.route('/admin/delete_pet/<int:pet_id>', methods=['POST'])
+@login_required
+def delete_pet(pet_id):
+    if current_user.role != "admin":
+        return jsonify({"error": "Access denied"}), 403
+
+    pet = LostPet.query.get_or_404(pet_id)
+
+    # Delete the image file too if it exists
+    image_path = os.path.join('static/uploads', pet.image)
+    if os.path.exists(image_path):
+        os.remove(image_path)
+
+    db.session.delete(pet)
+    db.session.commit()
+
+    return redirect(url_for('admin_lost_pets'))
+
+@app.route('/admin/lost_pets')
+@login_required
+def admin_lost_pets():
+    if current_user.role != "admin":
+        flash("Access denied!", "danger")
+        return redirect(url_for('login'))
+
+    pets = LostPet.query.order_by(LostPet.id.desc()).all()
+    return render_template('admin_lost.html', pets=pets, user=current_user)
+
+@app.route('/admin/update_lost_status/<int:pet_id>/<string:action>')
+@login_required
+def update_lost_status(pet_id, action):
+    if current_user.role != "admin":
+        flash("Access denied!", "danger")
+        return redirect(url_for('login'))
+
+    pet = LostPet.query.get_or_404(pet_id)
+    if action == 'approve':
+        pet.status = 'approved'
+        flash(f"{pet.pet_name} report approved!", "success")
+    elif action == 'reject':
+        pet.status = 'rejected'
+        flash(f"{pet.pet_name} report rejected.", "warning")
+    
+    db.session.commit()
+    return redirect(url_for('admin_lost_pets'))
+
+@app.route('/admin/edit_pet/<int:pet_id>', methods=['GET', 'POST'])
+@login_required
+def edit_pet(pet_id):
+    if current_user.role != "admin":
+        flash("Access denied!", "danger")
+        return redirect(url_for('login'))
+
+    pet = LostPet.query.get_or_404(pet_id)
+
+    if request.method == 'POST':
+        pet.pet_name = request.form.get('pet_name')
+        pet.pet_type = request.form.get('pet_type')
+        pet.breed = request.form.get('breed')
+        pet.description = request.form.get('description')
+        pet.last_seen_location = request.form.get('last_seen_location')
+        pet.mobile = request.form.get('mobile')
+        pet.gender = request.form.get('gender')
+        pet.date_lost = request.form.get('date_lost')
+
+        image_file = request.files.get('image')
+        if image_file and image_file.filename:
+            filename = image_file.filename
+            image_file.save(os.path.join('static/uploads', filename))
+            pet.image = filename
+
+        db.session.commit()
+        flash("Pet updated successfully!", "success")
+        return redirect(url_for('admin_lost_pets'))
+
+    return render_template('edit_pet.html', pet=pet, user=current_user)
+
 
 @app.route('/report_lost', methods=['GET', 'POST'])
 @login_required
@@ -147,26 +256,29 @@ def report_lost():
             date_lost=datetime.strptime(date_lost, '%Y-%m-%d') if date_lost else None,
             mobile=mobile,
             gender=gender,
-            image=filename
+            image=filename,
+            status="pending"
         )
         db.session.add(new_pet)
         db.session.commit()
 
         flash('Lost pet reported successfully!')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('user_dashboard'))
     
-    return render_template('report_lost.html', user=current_user)
+    lost_pets = LostPet.query.filter_by(status='approved').order_by(LostPet.id.desc()).all()
+    return render_template('report_lost.html', user=current_user, lost_pets=lost_pets)
 
 @app.route('/user/my_lost_requests')
 @login_required
 def my_lost_requests():
-    pets = LostPet.query.filter_by(user_id=current_user.id).all()
-    return render_template('my_lost_requests.html',user=current_user, pets=pets)
+    user_id = current_user.id
+    pets = LostPet.query.filter_by(user_id=user_id).all()
+    return render_template('my_lost_request.html',user=current_user, pets=pets)
 
 @app.route('/lost_pets')
 @login_required
 def lost_pets():
-    pets = LostPet.query.all()  # fetch all lost pets, not just current user
+    pets = LostPet.query.filter_by(status='approved').all()  # fetch all lost pets, not just current user
     return render_template('lost_pet.html', pets=pets, user=current_user)
 
 @app.route('/found_pets')

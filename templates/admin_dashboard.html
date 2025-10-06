@@ -17,12 +17,12 @@
         <!-- Main Dashboard View -->
         <div id="dashboard-view" class="dashboard-content">
             <div class="action-buttons">
-                <button class="action-btn lost-btn" data-type="lost">
+                <a href="{{ url_for('admin_lost_pets') }}" class="action-btn lost-btn">
                     <div class="btn-content">
                         <h3>Lost</h3>
-                        <span class="count" id="lost-count">0</span>
+                        <span class="count">{{ lost_count }}</span>
                     </div>
-                </button>
+                </a>
                 
                 <button class="action-btn found-btn" data-type="found">
                     <div class="btn-content">

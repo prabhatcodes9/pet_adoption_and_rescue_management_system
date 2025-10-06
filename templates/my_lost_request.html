@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetConnect - Find Your Perfect Pet Companion</title>
+    <meta name="description" content="Connect with loving pets in need of homes. Find lost pets, report found animals, and discover your perfect pet companion through our adoption services.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/report_lost.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🐾</span>
+                    <h1 class="logo-text">Welcome {{ user.name }} !</h1>
+                </div>
+                <nav class="header-nav">
+                <a href="{{ url_for('user_dashboard') }}" class="btn btn-primary">Dashboard</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <section class="lost-pets-section">
+    <div class="container">
+        <header class="dashboard-header">
+            <h1>My Lost Pet Requests</h1>
+        </header>
+
+        <div class="cards-grid">
+            {% if pets %}
+                {% for pet in pets %}
+                    <div class="pet-image">
+                        <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
+                    </div>
+                    <div class="pet-details">
+                        <h3>{{ pet.pet_name }}</h3>
+                        <p><strong>Type:</strong> {{ pet.pet_type }}</p>
+                        <p><strong>Breed:</strong> {{ pet.breed }}</p>
+                        <p><strong>Description:</strong> {{ pet.description }}</p>
+                        <p><strong>Gender:</strong> {{ pet.gender }}</p>
+                        <p><strong>Date Lost:</strong> {{ pet.date_lost.strftime('%d %B %Y') if pet.date_lost else 'N/A' }}</p>
+                        <p><strong>Last Seen:</strong> {{ pet.last_seen_location }}</p>
+                        <p><strong>Mobile:</strong> {{ pet.mobile }}</p>
+                        <p><strong>Status:</strong>
+                            {% if pet.status == 'approved' %}
+                                <span class="status approved">Approved</span>
+                            {% elif pet.status == 'pending' %}
+                                <span class="status pending">Pending</span>
+                            {% elif pet.status == 'rejected' %}
+                                <span class="status rejected">Rejected</span>
+                            {% else %}
+                                <span class="status">Unknown</span>
+                            {% endif %}
+                        </p>
+
+                        <div class="pet-actions">
+                            <a href="{{ url_for('edit_pet', pet_id=pet.id) }}" class="edit-btn">Edit</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>You haven't reported any lost pets yet.</p>
+            {% endif %}
+        </div>
+    </div>
+    </section>
+    </body>
+</html>

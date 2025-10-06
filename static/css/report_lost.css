@@ -559,3 +559,67 @@ body {
     min-width: 140px;
     text-align: center;
 }
+.lost-pets-section {
+    padding: 40px 0;
+    background-color: #f8fafc;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 cards per row */
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.pet-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease;
+    height: 100%; /* makes it fit grid */
+}
+
+.pet-card:hover {
+    transform: translateY(-5px);
+}
+
+.pet-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.pet-details {
+    padding: 15px;
+}
+
+.pet-details h3 {
+    margin-bottom: 8px;
+    color: #222;
+}
+
+.pet-details p {
+    font-size: 0.9rem;
+    margin: 5px 0;
+}
+.status {
+            margin-top: 10px;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            text-transform: capitalize;
+        }
+        .status.pending {
+            background: orange;
+            color: #fff;
+        }
+        .status.approved {
+            background: green;
+            color: #fff;
+        }
+        .status.rejected {
+            background: red;
+            color: #fff;
+        }

@@ -1,0 +1,305 @@
+/* Reset + Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background-color: #fafafa;
+  color: #2d3748;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* Header Section */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between; /* title left, button right */
+  align-items: center;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+}
+
+.dashboard-header h1 {
+  font-size: 2rem;
+  color: #1a202c;
+}
+
+.dashboard-header p {
+  color: #718096;
+  font-size: 1rem;
+  margin-top: 5px;
+}
+
+/* Back button */
+.back-btn {
+  background: #28a745;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.back-btn:hover {
+  background: #218838;
+}
+
+/* Pet Grid */
+.pet-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.pet-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  transition: transform 0.2s ease;
+  text-align: center;
+}
+
+.pet-card:hover {
+  transform: translateY(-5px);
+}
+
+.pet-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.pet-card h3 {
+  font-size: 1.2rem;
+  color: #2d3748;
+  margin-bottom: 5px;
+}
+
+.pet-card p {
+  font-size: 0.9rem;
+  color: #4a5568;
+  margin-bottom: 5px;
+}
+
+/* Action Buttons */
+.pet-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.edit-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.edit-btn:hover {
+  background-color: #0056b3;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* Responsive Grid */
+@media (max-width: 1024px) {
+  .pet-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .pet-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .back-btn {
+    align-self: flex-end;
+  }
+}
+.edit-modal {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+        }
+
+        /* --- Modal Box --- */
+        .edit-modal-content {
+            background: #fff;
+            border-radius: 12px;
+            padding: 32px;
+            width: 95%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Form Elements --- */
+        .edit-modal-content h2 {
+            text-align: center;
+            color: #2b7a78;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .edit-form .form-group {
+            margin-bottom: 18px;
+        }
+
+        .edit-form label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            color: #2d3748;
+        }
+
+        .edit-form input,
+        .edit-form select,
+        .edit-form textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            font-size: 15px;
+            transition: border-color 0.2s ease;
+        }
+
+        .edit-form input:focus,
+        .edit-form textarea:focus,
+        .edit-form select:focus {
+            border-color: #2b7a78;
+            outline: none;
+        }
+
+        .edit-form textarea {
+            resize: none;
+            min-height: 90px;
+        }
+
+        /* --- Buttons --- */
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+
+        .modal-actions .btn {
+            width: 48%;
+        }
+
+        /* --- Image Preview --- */
+        .image-preview {
+            width: 120px;
+            height: 120px;
+            border: 2px dashed #e2e8f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-top: 10px;
+            background: #f7fafc;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- Close Button --- */
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            color: #718096;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #2d3748;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .pending { background-color: #ffcc00; color: #222; }
+        .approved { background-color: #28a745; color: white; }
+        .rejected { background-color: #dc3545; color: white; }
+
+        .approve-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+        .reject-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .approve-btn:hover, .reject-btn:hover { opacity: 0.85; }
