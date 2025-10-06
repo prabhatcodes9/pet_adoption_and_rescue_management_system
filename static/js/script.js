@@ -51,6 +51,6 @@ function switchToLoginModal(){ closeRegisterModal(); openLoginModal(); }
 // Action card handlers (navigate to endpoints)
 function handleActionClick(action) {
     if (action === 'lost') { window.location.href = '/report_lost'; }
-    else if (action === 'found') { alert('Found pets endpoint not implemented yet'); }
+    else if (action === 'found') { window.location.href = '/report_found'; }
     else if (action === 'adopt') { alert('Adoption listing not implemented yet'); }
 }

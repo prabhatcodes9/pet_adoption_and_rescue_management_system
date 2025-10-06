@@ -42,6 +42,20 @@ class LostPet(db.Model):
     image = db.Column(db.String(255))
     status = db.Column(db.String(20), default="pending")
 
+class FoundPet(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    pet_name = db.Column(db.String(100), nullable=True)
+    pet_type = db.Column(db.String(50), nullable=False)
+    breed = db.Column(db.String(100), nullable=True)
+    description = db.Column(db.Text)
+    found_location = db.Column(db.String(255))
+    date_found = db.Column(db.Date)
+    mobile = db.Column(db.String(15))
+    gender = db.Column(db.String(10))
+    image = db.Column(db.String(255))
+    status = db.Column(db.String(20), default="pending")
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -121,7 +135,7 @@ def admin_dashboard():
         return redirect(url_for('login'))
     
     lost_count = LostPet.query.count()
-    found_count = 0  # Placeholder for FoundPet model
+    found_count = FoundPet.query.count()  # Placeholder for FoundPet model
     adopt_count = 0  # Placeholder for AdoptPet model
 
     return render_template('admin_dashboard.html', user=current_user, lost_count=lost_count, found_count=found_count, adopt_count=adopt_count)
@@ -135,7 +149,11 @@ def get_pets(pet_type):
     # Currently, we only have lost pets implemented
     if pet_type == "lost":
         pets = LostPet.query.all()
-        pet_data = [{
+    elif pet_type == "found":
+        pets = FoundPet.query.all()  # Placeholder for FoundPet model
+    else:
+        return jsonify([])
+    pet_data = [{
             "id": pet.id,
             "name": pet.pet_name,
             "breed": pet.breed,
@@ -143,12 +161,14 @@ def get_pets(pet_type):
             "image": pet.image,
             "gender": pet.gender,
             "pet_type": pet.pet_type,
-            "date_lost": pet.date_lost.strftime('%Y-%m-%d') if pet.date_lost else None,
+            "date_lost": pet.date_lost.strftime('%Y-%m-%d') if getattr(pet, 'date_lost', None) else None,
+            "date_found": pet.date_found.strftime('%Y-%m-%d') if getattr(pet, 'date_found', None) else None,
             "mobile": pet.mobile
         } for pet in pets]
-        return jsonify(pet_data)
     
-    return jsonify([])
+    return jsonify(pet_data)
+    
+    
 
 @app.route('/admin/delete_pet/<int:pet_id>', methods=['POST'])
 @login_required
@@ -168,6 +188,25 @@ def delete_pet(pet_id):
 
     return redirect(url_for('admin_lost_pets'))
 
+@app.route('/admin/delete_found_pet/<int:pet_id>', methods=['POST'])
+@login_required
+def delete_found_pet(pet_id):
+    if current_user.role != "admin":
+        return jsonify({"error": "Access denied"}), 403
+
+    pet = FoundPet.query.get_or_404(pet_id)
+
+    # Delete the image file too if it exists
+    image_path = os.path.join('static/uploads', pet.image)
+    if os.path.exists(image_path):
+        os.remove(image_path)
+
+    db.session.delete(pet)
+    db.session.commit()
+
+    flash("Found pet deleted successfully!", "success")
+    return redirect(url_for('admin_found_pets'))
+
 @app.route('/admin/lost_pets')
 @login_required
 def admin_lost_pets():
@@ -177,6 +216,16 @@ def admin_lost_pets():
 
     pets = LostPet.query.order_by(LostPet.id.desc()).all()
     return render_template('admin_lost.html', pets=pets, user=current_user)
+
+@app.route('/admin/found_pets')
+@login_required
+def admin_found_pets():
+    if current_user.role != "admin":
+        flash("Access denied!", "danger")
+        return redirect(url_for('login'))
+
+    pets = FoundPet.query.order_by(FoundPet.id.desc()).all()
+    return render_template('admin_found.html', pets=pets, user=current_user)
 
 @app.route('/admin/update_lost_status/<int:pet_id>/<string:action>')
 @login_required
@@ -195,6 +244,29 @@ def update_lost_status(pet_id, action):
     
     db.session.commit()
     return redirect(url_for('admin_lost_pets'))
+
+@app.route('/admin/update_found_status/<int:pet_id>/<string:action>')
+@login_required
+def update_found_status(pet_id, action):
+    if current_user.role != "admin":
+        flash("Access denied!", "danger")
+        return redirect(url_for('login'))
+
+    pet = FoundPet.query.get_or_404(pet_id)
+
+    if action == 'approve':
+        pet.status = 'approved'
+        flash(f"{pet.pet_name} found report approved!", "success")
+    elif action == 'reject':
+        pet.status = 'rejected'
+        flash(f"{pet.pet_name} found report rejected.", "warning")
+    else:
+        flash("Invalid action.", "danger")
+        return redirect(url_for('admin_found_pets'))
+
+    db.session.commit()
+    return redirect(url_for('admin_found_pets'))
+
 
 @app.route('/admin/edit_pet/<int:pet_id>', methods=['GET', 'POST'])
 @login_required
@@ -281,11 +353,58 @@ def lost_pets():
     pets = LostPet.query.filter_by(status='approved').all()  # fetch all lost pets, not just current user
     return render_template('lost_pet.html', pets=pets, user=current_user)
 
+@app.route('/report_found', methods=['GET', 'POST'])
+@login_required
+def report_found():
+    if request.method == 'POST':
+        pet_name = request.form.get('pet_name')
+        pet_type = request.form.get('pet_type')
+        breed = request.form.get('breed')
+        description = request.form.get('description')
+        found_location = request.form.get('found_location')
+        date_found = request.form.get('date_found')
+        mobile = request.form.get('mobile') or current_user.mobile
+        gender = request.form.get('gender')
+
+        image_file = request.files.get('image')
+        filename = image_file.filename
+        image_file.save(os.path.join('static/uploads', filename))
+        
+
+        new_pet = FoundPet(
+            user_id=current_user.id,
+            pet_name=pet_name,
+            pet_type=pet_type,
+            breed=breed,
+            description=description,
+            found_location=found_location,
+            date_found=datetime.strptime(date_found, '%Y-%m-%d') if date_found else None,
+            mobile=mobile,
+            gender=gender,
+            image=filename,
+            status="pending"
+        )
+        db.session.add(new_pet)
+        db.session.commit()
+
+        flash('Found pet reported successfully!')
+        return redirect(url_for('user_dashboard'))
+    
+    found_pets = FoundPet.query.filter_by(status='approved').order_by(FoundPet.id.desc()).all()
+    return render_template('report_found.html', user=current_user, found_pets=found_pets)
+
+@app.route('/user/my_found_requests')
+@login_required
+def my_found_requests():
+    user_id = current_user.id
+    pets = FoundPet.query.filter_by(user_id=user_id).all()
+    return render_template('my_found_request.html',user=current_user, pets=pets)
+
 @app.route('/found_pets')
 @login_required
 def found_pets():
-    # later you’ll create FoundPet model, same style
-    return render_template('found_pet.html', user=current_user)
+    pets = FoundPet.query.filter_by(status='approved').all()
+    return render_template('found_pet.html', user=current_user, pets=pets)
 
 @app.route('/adopt_pets')
 @login_required

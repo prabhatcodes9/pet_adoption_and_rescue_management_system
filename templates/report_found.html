@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetConnect - Find Your Perfect Pet Companion</title>
+    <meta name="description" content="Connect with loving pets in need of homes. Find lost pets, report found animals, and discover your perfect pet companion through our adoption services.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/report_found.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🐾</span>
+                    <h1 class="logo-text">Welcome {{ user.name }} !</h1>
+                </div>
+                <nav class="header-nav">
+                <button class="btn btn-primary" id="openModalBtn" data-testid="button-login">Report a Found</button>
+                <a href="{{ url_for('my_found_requests') }}" class="btn btn-primary">My Found requests</a>
+                <a href="{{ url_for('user_dashboard') }}" class="btn btn-primary">Dashboard</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <!-- Report a Found -->
+     <div id="foundModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🐾 Report Found Pet</h2>
+        <span class="close" id="closeModal">&times;</span>
+      </div>
+
+      <form class="modal-form" method="POST" enctype="multipart/form-data" action="{{ url_for('report_found') }}">
+        <div class="form-group">
+          <label for="pet_name">Pet Name</label>
+          <input type="text" id="pet_name" name="pet_name" placeholder="Enter pet name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="pet_type">Pet Type</label>
+          <input type="text" id="pet_type" name="pet_type" placeholder="Dog, Cat, etc." required>
+        </div>
+
+        <div class="form-group">
+          <label for="breed">Breed</label>
+          <input type="text" id="breed" name="breed" placeholder="Enter breed" required>
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select id="gender" name="gender" required>
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="None">None</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="last_seen_location">Found Location</label>
+          <input type="text" id="found_location" name="found_location" placeholder="Enter location" required>
+        </div>
+
+        <div class="form-group">
+          <label for="date_lost">Date Found</label>
+          <input type="date" id="date_found" name="date_found" required>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" placeholder="Describe your pet..." rows="4" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="contact">Contact Number</label>
+          <input type="tel" id="mobile" name="mobile" placeholder="Enter contact number" required>
+        </div>
+
+        <div class="form-group">
+          <label for="image">Upload Pet Image</label>
+          <input type="file" id="image" name="image" accept="uploads/" required>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary btn-full">Submit Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+    <!-- Found Pets List -->
+     <section class="found-pets-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Recently Reported Found Pets</h2>
+            </div>
+
+            <div class="cards-grid">
+    {% if found_pets %}
+        {% for pet in found_pets %}
+        <div class="pet-card">
+            <div class="pet-image">
+                <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
+            </div>
+            <div class="pet-details">
+                <h3>{{ pet.pet_name }}</h3>
+                <p><strong>Type:</strong> {{ pet.pet_type }}</p>
+                <p><strong>Breed:</strong> {{ pet.breed }}</p>
+                <p><strong>Description:</strong> {{ pet.description }}</p>
+                <p><strong>Gender:</strong> {{ pet.gender }}</p>
+                <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%d %B %Y') if pet.date_found else 'N/A' }}</p>
+                <p><strong>Found Location:</strong> {{ pet.found_location }}</p>
+                <p><strong>Contact:</strong> {{ pet.mobile }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-data">No lost pets reported yet.</p>
+    {% endif %}
+</div>
+        </div>
+    </section>
+      <script>
+    const modal = document.getElementById("foundModal");
+    const openBtn = document.getElementById("openModalBtn");
+    const closeBtn = document.getElementById("closeModal");
+
+    openBtn.addEventListener("click", () => {
+      modal.style.display = "block";
+    });
+
+    closeBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.style.display = "none";
+      }
+    });
+  </script>
+  </body>
+</html>

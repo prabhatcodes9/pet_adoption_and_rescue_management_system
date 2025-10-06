@@ -24,12 +24,12 @@
                     </div>
                 </a>
                 
-                <button class="action-btn found-btn" data-type="found">
+                <a href="{{ url_for('admin_found_pets') }}" class="action-btn lost-btn">
                     <div class="btn-content">
                         <h3>Found</h3>
-                        <span class="count" id="found-count">0</span>
+                        <span class="count">{{ found_count }}</span>
                     </div>
-                </button>
+                </a>
                 
                 <button class="action-btn adopt-btn" data-type="adopt">
                     <div class="btn-content">
