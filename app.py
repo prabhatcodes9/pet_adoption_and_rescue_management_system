@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from flask import jsonify
 
@@ -55,6 +55,40 @@ class FoundPet(db.Model):
     gender = db.Column(db.String(10))
     image = db.Column(db.String(255))
     status = db.Column(db.String(20), default="pending")
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    message = db.Column(db.String(255), nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='notifications', lazy=True)
+
+    def is_expired(self):
+        """Check if the notification is older than 10 minutes."""
+        return datetime.utcnow() > self.timestamp + timedelta(minutes=10)
+
+@app.route('/admin/approve_pet/<int:pet_id>', methods=['POST'])
+@login_required
+def approve_pet(pet_id):
+    if current_user.role != "admin":
+        return jsonify({"error": "Access denied"}), 403
+
+    pet = LostPet.query.get_or_404(pet_id)
+    pet.is_approved = True
+    db.session.commit()
+
+    # Create notification for the pet owner
+    notification = Notification(
+        user_id=pet.user_id,
+        message=f"Your {pet.pet_type} '{pet.pet_name}' request has been approved by admin."
+    )
+    db.session.add(notification)
+    db.session.commit()
+
+    flash("Pet request approved and user notified!", "success")
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/')
 def home():
@@ -125,7 +159,23 @@ def user_dashboard():
     if current_user.role != "user":
         flash("Access denied!", "danger")
         return redirect(url_for('login'))
-    return render_template('dashboard.html', user=current_user)
+
+    # Delete notifications older than 10 minutes
+    now = datetime.utcnow()
+    Notification.query.filter(Notification.timestamp < now - timedelta(minutes=10)).delete()
+    db.session.commit()
+
+    unread_count = Notification.query.filter_by(user_id=current_user.id, is_read=False).count()
+    notifications = Notification.query.filter_by(user_id=current_user.id).order_by(Notification.timestamp.desc()).all()
+
+    return render_template('dashboard.html', user=current_user, unread_count=unread_count, notifications=notifications)
+
+@app.route('/mark_notifications_read', methods=['POST'])
+@login_required
+def mark_notifications_read():
+    Notification.query.filter_by(user_id=current_user.id, is_read=False).update({'is_read': True})
+    db.session.commit()
+    return jsonify({"success": True})
 
 @app.route('/admin/dashboard')
 @login_required
@@ -238,9 +288,20 @@ def update_lost_status(pet_id, action):
     if action == 'approve':
         pet.status = 'approved'
         flash(f"{pet.pet_name} report approved!", "success")
+
+         # ✅ Add notification for the user
+        message = f"Your lost pet report '{pet.pet_name}' has been approved by admin!"
+        notif = Notification(user_id=pet.user_id, message=message)
+        db.session.add(notif)
+
     elif action == 'reject':
         pet.status = 'rejected'
         flash(f"{pet.pet_name} report rejected.", "warning")
+
+        # ✅ Optional: notify rejection
+        message = f"Your lost pet report '{pet.pet_name}' has been rejected by admin."
+        notif = Notification(user_id=pet.user_id, message=message)
+        db.session.add(notif)
     
     db.session.commit()
     return redirect(url_for('admin_lost_pets'))
@@ -257,9 +318,21 @@ def update_found_status(pet_id, action):
     if action == 'approve':
         pet.status = 'approved'
         flash(f"{pet.pet_name} found report approved!", "success")
+
+        # ✅ Add notification
+        message = f"Your found pet report '{pet.pet_name}' has been approved by admin!"
+        notif = Notification(user_id=pet.user_id, message=message)
+        db.session.add(notif)
+
     elif action == 'reject':
         pet.status = 'rejected'
         flash(f"{pet.pet_name} found report rejected.", "warning")
+
+        # ✅ Add rejection notification
+        message = f"Your found pet report '{pet.pet_name}' has been rejected by admin."
+        notif = Notification(user_id=pet.user_id, message=message)
+        db.session.add(notif)
+
     else:
         flash("Invalid action.", "danger")
         return redirect(url_for('admin_found_pets'))

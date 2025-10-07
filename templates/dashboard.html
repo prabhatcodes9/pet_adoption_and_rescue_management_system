@@ -18,10 +18,38 @@
                     <span class="logo-icon">🐾</span>
                     <h1 class="logo-text">Welcome {{ user.name }} !</h1>
                 </div>
+                <div class="header-actions">
+                <button id="notifBtn" class="notif-button">
+                    Messages
+                    {% set unread = notifications | selectattr('is_read', 'equalto', False) | list %}
+                    {% if unread|length > 0 %}
+                    <span class="notif-count">{{ unread|length }}</span>
+                    {% endif %}
+                </button>
                 <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
-            </div>
+                </div>
+        </div>
         </div>
     </header>
+    <!-- 📬 Notification Popup -->
+  <div id="notifPopup" class="notif-popup">
+    <div class="notif-content">
+      <span class="close">&times;</span>
+      <h3>Your Notifications</h3>
+      {% if notifications %}
+        <ul>
+          {% for note in notifications %}
+            <li class="{{ 'read' if note.is_read else 'unread' }}">
+              {{ note.message }} <br>
+              <small>{{ note.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No notifications yet.</p>
+      {% endif %}
+    </div>
+  </div>
     <!--Action Card-->
     <section class="action-cards">
         <div class="container">
@@ -65,5 +93,17 @@
             </div>
         </div>
     </section>
+    <!-- JS for Notification Popup -->
+  <script>
+    const notifBtn = document.getElementById("notifBtn");
+    const notifPopup = document.getElementById("notifPopup");
+    const closeBtn = document.querySelector(".close");
+
+    notifBtn.onclick = () => notifPopup.style.display = "block";
+    closeBtn.onclick = () => notifPopup.style.display = "none";
+    window.onclick = (event) => {
+      if (event.target == notifPopup) notifPopup.style.display = "none";
+    };
+  </script>
   </body>
 </html>

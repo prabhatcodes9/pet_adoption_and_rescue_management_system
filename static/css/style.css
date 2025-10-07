@@ -559,3 +559,74 @@ body {
     min-width: 140px;
     text-align: center;
 }
+.notif-button {
+  position: relative;
+  background-color: #2b7a78; /* Same as logout */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+}
+.notif-button:hover {
+  background-color: #1a5f5e;
+  transform: translateY(-1px);
+}
+
+    .notif-count {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: red;
+      color: white;
+      font-size: 12px;
+      border-radius: 50%;
+      padding: 2px 6px;
+    }
+
+    .notif-popup {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .notif-content {
+      background-color: #fff;
+      margin: 8% auto;
+      padding: 20px;
+      width: 400px;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .notif-content ul {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+
+    .notif-content li {
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .notif-content li.unread {
+      background-color: #eef5ff;
+    }
+
+    .close {
+      float: right;
+      font-size: 22px;
+      cursor: pointer;
+    }
