@@ -52,5 +52,5 @@ function switchToLoginModal(){ closeRegisterModal(); openLoginModal(); }
 function handleActionClick(action) {
     if (action === 'lost') { window.location.href = '/report_lost'; }
     else if (action === 'found') { window.location.href = '/report_found'; }
-    else if (action === 'adopt') { alert('Adoption listing not implemented yet'); }
+    else if (action === 'adopt') { window.location.href = '/report_adopt'; }
 }

@@ -56,6 +56,21 @@ class FoundPet(db.Model):
     image = db.Column(db.String(255))
     status = db.Column(db.String(20), default="pending")
 
+class AdoptPet(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    pet_name = db.Column(db.String(100), nullable=False)
+    pet_type = db.Column(db.String(50), nullable=False)
+    breed = db.Column(db.String(100))
+    description = db.Column(db.Text)
+    age = db.Column(db.String(50))
+    injury = db.Column(db.String(10))
+    mobile = db.Column(db.String(15))
+    gender = db.Column(db.String(10))
+    location = db.Column(db.String(255))
+    image = db.Column(db.String(255))
+    status = db.Column(db.String(20), default="pending")
+
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -186,7 +201,7 @@ def admin_dashboard():
     
     lost_count = LostPet.query.count()
     found_count = FoundPet.query.count()  # Placeholder for FoundPet model
-    adopt_count = 0  # Placeholder for AdoptPet model
+    adopt_count = AdoptPet.query.count()  # Placeholder for AdoptPet model
 
     return render_template('admin_dashboard.html', user=current_user, lost_count=lost_count, found_count=found_count, adopt_count=adopt_count)
 
@@ -257,6 +272,25 @@ def delete_found_pet(pet_id):
     flash("Found pet deleted successfully!", "success")
     return redirect(url_for('admin_found_pets'))
 
+@app.route('/admin/delete_adopt_pet/<int:pet_id>', methods=['POST'])
+@login_required
+def delete_adopt_pet(pet_id):
+    if current_user.role != "admin":
+        return jsonify({"error": "Access denied"}), 403
+
+    pet = AdoptPet.query.get_or_404(pet_id)
+
+    # Delete the image file too if it exists
+    image_path = os.path.join('static/uploads', pet.image)
+    if os.path.exists(image_path):
+        os.remove(image_path)
+
+    db.session.delete(pet)
+    db.session.commit()
+
+    flash("Adoption pet deleted successfully!", "success")
+    return redirect(url_for('admin_adopt_pets'))
+
 @app.route('/admin/lost_pets')
 @login_required
 def admin_lost_pets():
@@ -277,6 +311,16 @@ def admin_found_pets():
     pets = FoundPet.query.order_by(FoundPet.id.desc()).all()
     return render_template('admin_found.html', pets=pets, user=current_user)
 
+@app.route('/admin/adopt_pets')
+@login_required
+def admin_adopt_pets():
+    if current_user.role != "admin":
+        flash("Access denied!", "danger")
+        return redirect(url_for('user_dashboard'))
+
+    pets = AdoptPet.query.order_by(AdoptPet.id.desc()).all()
+    return render_template('admin_adopt.html', pets=pets, user=current_user)
+
 @app.route('/admin/update_lost_status/<int:pet_id>/<string:action>')
 @login_required
 def update_lost_status(pet_id, action):
@@ -290,7 +334,7 @@ def update_lost_status(pet_id, action):
         flash(f"{pet.pet_name} report approved!", "success")
 
          # ✅ Add notification for the user
-        message = f"Your lost pet report '{pet.pet_name}' has been approved by admin!"
+        message = f"Your lost pet report '{pet.pet_name}' has been approved !"
         notif = Notification(user_id=pet.user_id, message=message)
         db.session.add(notif)
 
@@ -299,7 +343,7 @@ def update_lost_status(pet_id, action):
         flash(f"{pet.pet_name} report rejected.", "warning")
 
         # ✅ Optional: notify rejection
-        message = f"Your lost pet report '{pet.pet_name}' has been rejected by admin."
+        message = f"Your lost pet report '{pet.pet_name}' has been rejected."
         notif = Notification(user_id=pet.user_id, message=message)
         db.session.add(notif)
     
@@ -320,7 +364,7 @@ def update_found_status(pet_id, action):
         flash(f"{pet.pet_name} found report approved!", "success")
 
         # ✅ Add notification
-        message = f"Your found pet report '{pet.pet_name}' has been approved by admin!"
+        message = f"Your found pet report '{pet.pet_name}' has been approved!"
         notif = Notification(user_id=pet.user_id, message=message)
         db.session.add(notif)
 
@@ -329,7 +373,7 @@ def update_found_status(pet_id, action):
         flash(f"{pet.pet_name} found report rejected.", "warning")
 
         # ✅ Add rejection notification
-        message = f"Your found pet report '{pet.pet_name}' has been rejected by admin."
+        message = f"Your found pet report '{pet.pet_name}' has been rejected."
         notif = Notification(user_id=pet.user_id, message=message)
         db.session.add(notif)
 
@@ -340,6 +384,39 @@ def update_found_status(pet_id, action):
     db.session.commit()
     return redirect(url_for('admin_found_pets'))
 
+@app.route('/admin/update_adopt_status/<int:pet_id>/<string:action>')
+@login_required
+def update_adopt_status(pet_id, action):
+    if current_user.role != "admin":
+        flash("Access denied!", "danger")
+        return redirect(url_for('login'))
+
+    pet = AdoptPet.query.get_or_404(pet_id)
+
+    if action == 'approve':
+        pet.status = 'approved'
+        flash(f"{pet.pet_name} found report approved!", "success")
+
+        # ✅ Add notification
+        message = f"Your adoption pet report '{pet.pet_name}' has been approved!"
+        notif = Notification(user_id=pet.user_id, message=message)
+        db.session.add(notif)
+
+    elif action == 'reject':
+        pet.status = 'rejected'
+        flash(f"{pet.pet_name} found report rejected.", "warning")
+
+        # ✅ Add rejection notification
+        message = f"Your adoption pet report '{pet.pet_name}' has been rejected."
+        notif = Notification(user_id=pet.user_id, message=message)
+        db.session.add(notif)
+
+    else:
+        flash("Invalid action.", "danger")
+        return redirect(url_for('admin_adopt_pets'))
+
+    db.session.commit()
+    return redirect(url_for('admin_adopt_pets'))
 
 @app.route('/admin/edit_pet/<int:pet_id>', methods=['GET', 'POST'])
 @login_required
@@ -408,10 +485,53 @@ def report_lost():
         db.session.commit()
 
         flash('Lost pet reported successfully!')
-        return redirect(url_for('user_dashboard'))
+        return redirect(url_for('report_lost'))
     
     lost_pets = LostPet.query.filter_by(status='approved').order_by(LostPet.id.desc()).all()
     return render_template('report_lost.html', user=current_user, lost_pets=lost_pets)
+
+@app.route('/report_adopt', methods=['GET', 'POST'])
+@login_required
+def report_adopt():
+    if request.method == 'POST':
+        pet_name = request.form.get('pet_name')
+        pet_type = request.form.get('pet_type')
+        breed = request.form.get('breed')
+        description = request.form.get('description')
+        age = request.form.get('age')
+        injury = request.form.get('injury')
+        gender = request.form.get('gender')
+        mobile = request.form.get('mobile')
+        location = request.form.get('location')
+        image = request.files.get('image')
+
+        image_filename = None
+        if image:
+            image_filename = image.filename
+            image.save(os.path.join('static/uploads', image_filename))
+
+        new_pet = AdoptPet(
+            user_id=current_user.id,
+            pet_name=pet_name,
+            pet_type=pet_type,
+            breed=breed,
+            description=description,
+            age=age,
+            injury=injury,
+            gender=gender,
+            mobile=mobile,
+            location=location,
+            image=image_filename,
+            status="pending"
+        )
+
+        db.session.add(new_pet)
+        db.session.commit()
+        flash("Adoption pet reported successfully!", "success")
+        return redirect(url_for('report_adopt'))
+
+    adopt_pets = AdoptPet.query.filter_by(status='approved').order_by(AdoptPet.id.desc()).all()
+    return render_template('report_adopt.html', user=current_user, adopt_pets=adopt_pets)
 
 @app.route('/user/my_lost_requests')
 @login_required
@@ -461,7 +581,7 @@ def report_found():
         db.session.commit()
 
         flash('Found pet reported successfully!')
-        return redirect(url_for('user_dashboard'))
+        return redirect(url_for('report_found'))
     
     found_pets = FoundPet.query.filter_by(status='approved').order_by(FoundPet.id.desc()).all()
     return render_template('report_found.html', user=current_user, found_pets=found_pets)
@@ -482,8 +602,15 @@ def found_pets():
 @app.route('/adopt_pets')
 @login_required
 def adopt_pets():
-    # later you’ll create AdoptPet model, same style
-    return render_template('adopt_pet.html', user=current_user)
+    pets = AdoptPet.query.filter_by(status='approved').all()
+    return render_template('adopt_pet.html', user=current_user, pets=pets)
+
+@app.route('/user/my_adopt_requests')
+@login_required
+def my_adopt_requests():
+    user_id = current_user.id
+    pets = AdoptPet.query.filter_by(user_id=user_id).all()
+    return render_template('my_adopt_request.html',user=current_user, pets=pets)
 
 # ----------- Admin User Creation -----------
 with app.app_context():

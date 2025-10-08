@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_lost.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Dashboard Header -->
+        <header class="dashboard-header">
+            <h1>Pet Admin Dashboard</h1>
+            <p>Manage report for adoption approve or reject requests</p>
+            <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Back to Dashboard</a>
+        </header>
+
+        <div class="pet-grid">
+            {% if pets %}
+                {% for pet in pets %}
+                    <div class="pet-card">
+                        <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
+                        <h3>{{ pet.pet_name }}</h3>
+                        <p><strong>Type:</strong> {{ pet.pet_type }}</p>
+                        <p><strong>Breed:</strong> {{ pet.breed or 'N/A' }}</p>
+                        <p><strong>Age:</strong> {{ pet.age or 'N/A' }}</p>
+                        <p><strong>Injury:</strong> {{ pet.injury or 'N/A' }}</p>
+                        <p><strong>Description:</strong> {{ pet.description or 'N/A' }}</p>
+                        <p><strong>Gender:</strong> {{ pet.gender or 'N/A' }}</p>
+                        <p><strong>Location:</strong> {{ pet.location or 'N/A' }}</p>
+                        <p><strong>Mobile:</strong> {{ pet.mobile or 'N/A' }}</p>
+
+                        <!-- Status Badge -->
+                        <p><strong>Status:</strong>
+                            <span class="status-badge {{ pet.status|lower }}">{{ pet.status|capitalize }}</span>
+                        </p>
+
+                        <!-- Actions Section -->
+                        <div class="pet-actions">
+                            {% if pet.status == 'pending' %}
+                                <a href="{{ url_for('update_adopt_status', pet_id=pet.id, action='approve') }}" class="approve-btn">✅ Approve</a>
+                                <a href="{{ url_for('update_adopt_status', pet_id=pet.id, action='reject') }}" class="reject-btn">❌ Reject</a>
+                            {% endif %}
+
+                            <a href="{{ url_for('edit_pet', pet_id=pet.id) }}" class="edit-btn">✏️ Edit</a>
+
+                            <form action="{{ url_for('delete_adopt_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this pet?');">
+                                <button type="submit" class="delete-btn">🗑️ Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No pets for adoption reported yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

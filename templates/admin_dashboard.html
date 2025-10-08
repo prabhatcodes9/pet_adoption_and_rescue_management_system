@@ -31,12 +31,12 @@
                     </div>
                 </a>
                 
-                <button class="action-btn adopt-btn" data-type="adopt">
+                <a href="{{ url_for('admin_adopt_pets') }}" class="action-btn lost-btn">
                     <div class="btn-content">
                         <h3>Adopt</h3>
-                        <span class="count" id="adopt-count">0</span>
+                        <span class="count">{{ adopt_count }}</span>
                     </div>
-                </button>
+                </a>
             </div>
         </div>
 
