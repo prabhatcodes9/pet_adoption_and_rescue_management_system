@@ -71,6 +71,17 @@ class AdoptPet(db.Model):
     image = db.Column(db.String(255))
     status = db.Column(db.String(20), default="pending")
 
+class AdoptRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    pet_id = db.Column(db.Integer, db.ForeignKey('adopt_pet.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    mobile = db.Column(db.String(15), nullable=False)
+    address = db.Column(db.String(255), nullable=False)
+    request_date = db.Column(db.Date)
+    reason = db.Column(db.Text)
+    status = db.Column(db.String(20), default="pending")
+
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -279,6 +290,8 @@ def delete_adopt_pet(pet_id):
         return jsonify({"error": "Access denied"}), 403
 
     pet = AdoptPet.query.get_or_404(pet_id)
+
+    AdoptRequest.query.filter_by(pet_id=pet.id).delete()
 
     # Delete the image file too if it exists
     image_path = os.path.join('static/uploads', pet.image)
@@ -610,7 +623,56 @@ def adopt_pets():
 def my_adopt_requests():
     user_id = current_user.id
     pets = AdoptPet.query.filter_by(user_id=user_id).all()
-    return render_template('my_adopt_request.html',user=current_user, pets=pets)
+    for pet in pets:
+        pet.requests = AdoptRequest.query.filter_by(pet_id=pet.id).all()  # ✅ use "requests"
+    return render_template('my_adopt_request.html', user=current_user, pets=pets)
+
+@app.route('/adopt_request/<int:pet_id>', methods=['POST'])
+@login_required
+def adopt_request(pet_id):
+    existing_request = AdoptRequest.query.filter_by(user_id=current_user.id, pet_id=pet_id).first()
+    if existing_request:
+        flash("You have already made a request for this pet.", "warning")
+        return redirect(url_for('report_adopt'))
+
+    name = request.form.get('name')
+    mobile = request.form.get('mobile')
+    address = request.form.get('address')
+    request_date = request.form.get('request_date')
+    reason = request.form.get('reason')
+
+    new_request = AdoptRequest(
+        user_id=current_user.id,
+        pet_id=pet_id,
+        name=name,
+        mobile=mobile,
+        address=address,
+        request_date=datetime.strptime(request_date, '%Y-%m-%d') if request_date else None,
+        reason=reason,
+        status='pending'
+    )
+    db.session.add(new_request)
+    db.session.commit()
+
+    flash("Your adoption request has been sent!", "success")
+    return redirect(url_for('report_adopt'))
+
+@app.route('/update_request_status/<int:req_id>', methods=['POST'])
+@login_required
+def update_request_status(req_id):
+    status = request.form.get('status')
+    req = AdoptRequest.query.get_or_404(req_id)
+    pet = AdoptPet.query.get(req.pet_id)
+
+    # Only owner of pet can accept/reject
+    if pet.user_id != current_user.id:
+        flash("You are not authorized to modify this request.", "danger")
+        return redirect(url_for('my_adopt_request'))
+
+    req.status = status
+    db.session.commit()
+    flash(f"Request has been {status}.", "success")
+    return redirect(url_for('my_adopt_requests'))
 
 # ----------- Admin User Creation -----------
 with app.app_context():

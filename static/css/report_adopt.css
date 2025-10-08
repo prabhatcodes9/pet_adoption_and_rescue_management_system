@@ -623,3 +623,42 @@ body {
             background: red;
             color: #fff;
         }
+.request-section {
+            margin-top: 20px;
+            padding: 15px;
+            border-top: 2px solid #ccc;
+        }
+        .request-card {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .request-card h3 {
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .request-card p {
+            margin: 4px 0;
+        }
+        .request-card form {
+            margin-top: 10px;
+        }
+        .request-card button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 6px;
+            color: #fff;
+        }
+        .request-card button[name="status"][value="accepted"] {
+            background-color: #28a745;
+        }
+        .request-card button[name="status"][value="rejected"] {
+            background-color: #dc3545;
+        }
+        .request-card button:hover {
+            opacity: 0.9;
+        }

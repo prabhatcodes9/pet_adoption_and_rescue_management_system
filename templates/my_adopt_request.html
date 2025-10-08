@@ -57,17 +57,46 @@
                                 <span class="status">Unknown</span>
                             {% endif %}
                         </p>
-
-                        <div class="pet-actions">
-                            <a href="{{ url_for('edit_pet', pet_id=pet.id) }}" class="edit-btn">Edit</a>
-                        </div>
                     </div>
-                {% endfor %}
-            {% else %}
-                <p>You haven't reported any pets for adoption yet.</p>
-            {% endif %}
+                    <!-- Adoption Requests for this Pet -->
+                            <div class="request-section">
+                                <h2>Adoption Requests</h2>
+                                {% if pet.requests %}
+                                    {% for req in pet.requests %}
+                                        <div class="request-card">
+                                            <h3>Requested by {{ req.name }}</h3>
+                                            <p><strong>Mobile:</strong> {{ req.mobile }}</p>
+                                            <p><strong>Address:</strong> {{ req.address }}</p>
+                                            <p><strong>Reason:</strong> {{ req.reason }}</p>
+                                            <p><strong>Status:</strong> 
+                                                {% if req.status == 'pending' %}
+                                                    <span style="color:orange;">Pending</span>
+                                                {% elif req.status == 'accepted' %}
+                                                    <span style="color:green;">Accepted</span>
+                                                {% elif req.status == 'rejected' %}
+                                                    <span style="color:red;">Rejected</span>
+                                                {% endif %}
+                                            </p>
+
+                                            {% if req.status == 'pending' %}
+                                            <form method="POST" action="{{ url_for('update_request_status', req_id=req.id) }}">
+                                                <button name="status" value="accepted">Accept</button>
+                                                <button name="status" value="rejected">Reject</button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p>No requests for this pet yet.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>You haven't reported any pets for adoption yet.</p>
+                {% endif %}
+            </div>
         </div>
-    </div>
     </section>
     </body>
 </html>
