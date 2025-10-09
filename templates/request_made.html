@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetConnect - Find Your Perfect Pet Companion</title>
+    <meta name="description" content="Connect with loving pets in need of homes. Find lost pets, report found animals, and discover your perfect pet companion through our adoption services.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/report_adopt.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🐾</span>
+                    <h1 class="logo-text">Welcome {{ user.name }} !</h1>
+                </div>
+                <nav class="header-nav">
+                <a href="{{ url_for('report_adopt') }}" class="btn btn-primary">Back</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <section class="adopt-pets-section">
+    <div class="container">
+        <header class="dashboard-header">
+            <h1>Request Made by Me</h1>
+        </header>

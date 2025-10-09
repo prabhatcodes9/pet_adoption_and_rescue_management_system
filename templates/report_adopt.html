@@ -130,6 +130,8 @@
                       <button class="btn btn-primary openRequestModal" data-petid = "{{ pet.id }}" data-petname="{{ pet.pet_name }}">
                         Request
                       </button>
+                      {% else %}
+                      <p style="color: gray; font-style: italic;">(You reported this pet)</p>
                       {% endif %}
                   </div>
               </div>

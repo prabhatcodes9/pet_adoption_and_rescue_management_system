@@ -5,6 +5,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from datetime import datetime, timedelta
 import os
 from flask import jsonify
+import threading
+import time
 
 app = Flask(__name__)
 app.secret_key = 'my-secret-key'
@@ -50,7 +52,7 @@ class FoundPet(db.Model):
     breed = db.Column(db.String(100), nullable=True)
     description = db.Column(db.Text)
     found_location = db.Column(db.String(255))
-    date_found = db.Column(db.Date)
+    date_found = db.Column(db.DateTime, default=datetime.utcnow)
     mobile = db.Column(db.String(15))
     gender = db.Column(db.String(10))
     image = db.Column(db.String(255))
@@ -630,31 +632,41 @@ def my_adopt_requests():
 @app.route('/adopt_request/<int:pet_id>', methods=['POST'])
 @login_required
 def adopt_request(pet_id):
-    existing_request = AdoptRequest.query.filter_by(user_id=current_user.id, pet_id=pet_id).first()
-    if existing_request:
-        flash("You have already made a request for this pet.", "warning")
+    pet = AdoptPet.query.get_or_404(pet_id)
+
+    # Restrict the original finder from adopting their own pet
+    if pet.user_id == current_user.id:
+        flash("You cannot adopt a pet you reported as found.", "danger")
         return redirect(url_for('report_adopt'))
 
+    # Prevent duplicate requests by the same user for the same pet
+    existing_request = AdoptRequest.query.filter_by(user_id=current_user.id, pet_id=pet.id).first()
+    if existing_request:
+        flash("You have already sent an adoption request for this pet.", "warning")
+        return redirect(url_for('report_adopt'))
+
+    # Collect data from the form
     name = request.form.get('name')
     mobile = request.form.get('mobile')
     address = request.form.get('address')
-    request_date = request.form.get('request_date')
     reason = request.form.get('reason')
 
+    # Create a new adoption request entry
     new_request = AdoptRequest(
         user_id=current_user.id,
-        pet_id=pet_id,
+        pet_id=pet.id,
         name=name,
         mobile=mobile,
         address=address,
-        request_date=datetime.strptime(request_date, '%Y-%m-%d') if request_date else None,
         reason=reason,
-        status='pending'
+        request_date=datetime.utcnow().date(),
+        status="pending"
     )
+
     db.session.add(new_request)
     db.session.commit()
 
-    flash("Your adoption request has been sent!", "success")
+    flash("Your adoption request has been submitted successfully!", "success")
     return redirect(url_for('report_adopt'))
 
 @app.route('/update_request_status/<int:req_id>', methods=['POST'])
@@ -691,3 +703,41 @@ with app.app_context():
         db.session.add(admin_user)
         db.session.commit()
         print("✅ Admin user created: admin@petrescue.com / admin123")
+
+def move_found_pets_to_adopt():
+    while True:
+        with app.app_context():
+            now = datetime.utcnow()
+            threshold = now - timedelta(minutes=15)
+
+            old_pets = FoundPet.query.filter(FoundPet.date_found < threshold).all()
+
+            for pet in old_pets:
+                # Move details to AdoptPet
+                adopt_pet = AdoptPet(
+                    user_id=pet.user_id,  # original reporter (restricted later)
+                    pet_name=pet.pet_name or "Unknown",
+                    pet_type=pet.pet_type,
+                    breed=pet.breed,
+                    description=pet.description,
+                    age="Unknown",  # default since not in FoundPet
+                    injury="No",   # default, can be updated by admin if needed
+                    mobile=pet.mobile,
+                    gender=pet.gender,
+                    location=pet.found_location,
+                    image=pet.image,
+                    status="pending"
+                )
+
+                db.session.add(adopt_pet)
+                db.session.delete(pet)  # remove from found pets
+
+            if old_pets:
+                db.session.commit()
+
+        time.sleep(60)  # run every 60 seconds
+
+
+# Start background thread
+thread = threading.Thread(target=move_found_pets_to_adopt, daemon=True)
+thread.start()
