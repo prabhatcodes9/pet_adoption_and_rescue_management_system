@@ -333,8 +333,20 @@ def admin_adopt_pets():
         flash("Access denied!", "danger")
         return redirect(url_for('user_dashboard'))
 
+    # Fetch all adoption requests along with related pets and users
+    requests = db.session.query(
+        AdoptRequest,
+        AdoptPet.pet_name,
+        AdoptPet.pet_type,
+        AdoptPet.breed,
+        User.name.label('user_name'),
+        User.email.label('user_email')
+    ).join(AdoptPet, AdoptRequest.pet_id == AdoptPet.id) \
+     .join(User, AdoptRequest.user_id == User.id) \
+     .order_by(AdoptRequest.id.desc()).all()
+
     pets = AdoptPet.query.order_by(AdoptPet.id.desc()).all()
-    return render_template('admin_adopt.html', pets=pets, user=current_user)
+    return render_template('admin_adopt.html', requests=requests, user=current_user, pets=pets)
 
 @app.route('/admin/update_lost_status/<int:pet_id>/<string:action>')
 @login_required
@@ -545,7 +557,7 @@ def report_adopt():
         flash("Adoption pet reported successfully!", "success")
         return redirect(url_for('report_adopt'))
 
-    adopt_pets = AdoptPet.query.filter_by(status='approved').order_by(AdoptPet.id.desc()).all()
+    adopt_pets = AdoptPet.query.order_by(AdoptPet.id.desc()).all()
     return render_template('report_adopt.html', user=current_user, adopt_pets=adopt_pets)
 
 @app.route('/user/my_lost_requests')
@@ -686,6 +698,49 @@ def update_request_status(req_id):
     flash(f"Request has been {status}.", "success")
     return redirect(url_for('my_adopt_requests'))
 
+@app.route('/admin/adopt_requests')
+@login_required
+def admin_adopt_requests():
+    if current_user.role != "admin":
+        flash("Access denied!", "danger")
+        return redirect(url_for('login'))
+
+    requests = AdoptRequest.query.order_by(AdoptRequest.id.desc()).all()
+    return render_template('admin_adopt.html', requests=requests, user=current_user)
+
+@app.route('/admin/update_adopt_request/<int:req_id>/<string:action>', methods=['POST'])
+@login_required
+def update_adopt_request(req_id, action):
+    if current_user.role != "admin":
+        flash("Access denied!", "danger")
+        return redirect(url_for('login'))
+
+    req = AdoptRequest.query.get_or_404(req_id)
+    pet = AdoptPet.query.get(req.pet_id)
+
+    if action == "approve":
+        req.status = "approved"
+        pet.status = "adopted"  # ✅ update pet to adopted
+        message = f"Your adoption request for '{pet.pet_name}' has been approved!"
+        flash(f"Adoption request for {pet.pet_name} approved!", "success")
+
+    elif action == "reject":
+        req.status = "rejected"
+        message = f"Your adoption request for '{pet.pet_name}' has been rejected."
+        flash(f"Adoption request for {pet.pet_name} rejected!", "warning")
+    else:
+        flash("Invalid action.", "danger")
+        return redirect(url_for('admin_adopt'))
+
+    # Create notification for the requester
+    notif = Notification(user_id=req.user_id, message=message)
+    db.session.add(notif)
+
+    db.session.delete(req)  # Remove request after decision
+    db.session.commit()
+
+    return redirect(url_for('admin_adopt'))
+
 # ----------- Admin User Creation -----------
 with app.app_context():
     admin_email = "admin@petrescue.com"
@@ -710,7 +765,7 @@ def move_found_pets_to_adopt():
             now = datetime.utcnow()
             threshold = now - timedelta(minutes=15)
 
-            old_pets = FoundPet.query.filter(FoundPet.date_found < threshold).all()
+            old_pets = FoundPet.query.filter(FoundPet.date_found < threshold, FoundPet.status=='approved').all()
 
             for pet in old_pets:
                 # Move details to AdoptPet

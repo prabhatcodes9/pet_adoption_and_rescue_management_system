@@ -125,8 +125,9 @@
                       <p><strong>Gender:</strong> {{ pet.gender }}</p>
                       <p><strong>Location:</strong> {{ pet.location }}</p>
                       <p><strong>Contact:</strong> {{ pet.mobile }}</p>
-
-                      {% if pet.user_id != user.id %}
+                      {% if pet.status == 'adopted' %}
+                      <p style="color: green; font-weight: bold;">Adopted</p>
+                      {% elif pet.user_id != user.id %}
                       <button class="btn btn-primary openRequestModal" data-petid = "{{ pet.id }}" data-petname="{{ pet.pet_name }}">
                         Request
                       </button>

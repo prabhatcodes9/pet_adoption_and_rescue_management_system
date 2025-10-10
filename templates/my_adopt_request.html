@@ -19,76 +19,46 @@
                     <h1 class="logo-text">Welcome {{ user.name }} !</h1>
                 </div>
                 <nav class="header-nav">
-                <a href="{{ url_for('report_adopt') }}" class="btn btn-primary">Back</a>
+                    <a href="{{ url_for('report_adopt') }}" class="btn btn-primary">Back</a>
                 </nav>
             </div>
         </div>
     </header>
+
     <section class="adopt-pets-section">
-    <div class="container">
-        <header class="dashboard-header">
-            <h1>My Adoption Pet Requests</h1>
-        </header>
+        <div class="container">
+            <header class="dashboard-header">
+                <h1>My Adoption Pets</h1>
+            </header>
 
-        <div class="cards-grid">
-            {% if pets %}
-                {% for pet in pets %}
-                    <div class="pet-image">
-                        <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
-                    </div>
-                    <div class="pet-details">
-                        <h3>{{ pet.pet_name }}</h3>
-                        <p><strong>Type:</strong> {{ pet.pet_type }}</p>
-                        <p><strong>Breed:</strong> {{ pet.breed }}</p>
-                        <p><strong>Age:</strong> {{ pet.age }}</p>
-                        <p><strong>Injury:</strong> {{ pet.injury }}</p>
-                        <p><strong>Description:</strong> {{ pet.description }}</p>
-                        <p><strong>Gender:</strong> {{ pet.gender }}</p>
-                        <p><strong>Location:</strong> {{ pet.location }}</p>
-                        <p><strong>Mobile:</strong> {{ pet.mobile }}</p>
-                        <p><strong>Status:</strong>
-                            {% if pet.status == 'approved' %}
-                                <span class="status approved">Approved</span>
-                            {% elif pet.status == 'pending' %}
-                                <span class="status pending">Pending</span>
-                            {% elif pet.status == 'rejected' %}
-                                <span class="status rejected">Rejected</span>
-                            {% else %}
-                                <span class="status">Unknown</span>
-                            {% endif %}
-                        </p>
-                    </div>
-                    <!-- Adoption Requests for this Pet -->
-                            <div class="request-section">
-                                <h2>Adoption Requests</h2>
-                                {% if pet.requests %}
-                                    {% for req in pet.requests %}
-                                        <div class="request-card">
-                                            <h3>Requested by {{ req.name }}</h3>
-                                            <p><strong>Mobile:</strong> {{ req.mobile }}</p>
-                                            <p><strong>Address:</strong> {{ req.address }}</p>
-                                            <p><strong>Reason:</strong> {{ req.reason }}</p>
-                                            <p><strong>Status:</strong> 
-                                                {% if req.status == 'pending' %}
-                                                    <span style="color:orange;">Pending</span>
-                                                {% elif req.status == 'accepted' %}
-                                                    <span style="color:green;">Accepted</span>
-                                                {% elif req.status == 'rejected' %}
-                                                    <span style="color:red;">Rejected</span>
-                                                {% endif %}
-                                            </p>
+            <div class="cards-grid">
+                {% if pets %}
+                    {% for pet in pets %}
+                        <div class="pet-card">
+                            <div class="pet-image">
+                                <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
+                            </div>
+                            <div class="pet-details">
+                                <h3>{{ pet.pet_name }}</h3>
+                                <p><strong>Type:</strong> {{ pet.pet_type }}</p>
+                                <p><strong>Breed:</strong> {{ pet.breed }}</p>
+                                <p><strong>Age:</strong> {{ pet.age }}</p>
+                                <p><strong>Injury:</strong> {{ pet.injury }}</p>
+                                <p><strong>Description:</strong> {{ pet.description }}</p>
+                                <p><strong>Gender:</strong> {{ pet.gender }}</p>
+                                <p><strong>Location:</strong> {{ pet.location }}</p>
+                                <p><strong>Mobile:</strong> {{ pet.mobile }}</p>
 
-                                            {% if req.status == 'pending' %}
-                                            <form method="POST" action="{{ url_for('update_request_status', req_id=req.id) }}">
-                                                <button name="status" value="accepted">Accept</button>
-                                                <button name="status" value="rejected">Reject</button>
-                                            </form>
-                                            {% endif %}
-                                        </div>
-                                    {% endfor %}
-                                {% else %}
-                                    <p>No requests for this pet yet.</p>
-                                {% endif %}
+                                <!-- Pet Status Badge -->
+                                <p><strong>Status:</strong>
+                                    {% if pet.status == 'pending' %}
+                                        <span style="color:orange;">Pending Approval</span>
+                                    {% elif pet.status == 'adopted' %}
+                                        <span style="color:green;">Adopted ✅</span>
+                                    {% elif pet.status == 'rejected' %}
+                                        <span style="color:red;">Rejected ❌</span>
+                                    {% endif %}
+                                </p>
                             </div>
                         </div>
                     {% endfor %}
@@ -98,5 +68,5 @@
             </div>
         </div>
     </section>
-    </body>
+</body>
 </html>
