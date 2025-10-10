@@ -313,8 +313,23 @@ def admin_lost_pets():
         flash("Access denied!", "danger")
         return redirect(url_for('login'))
 
-    pets = LostPet.query.order_by(LostPet.id.desc()).all()
-    return render_template('admin_lost.html', pets=pets, user=current_user)
+    # Fetch pets by status
+    pending_pets = LostPet.query.filter_by(status='pending').order_by(LostPet.id.desc()).all()
+    approved_pets = LostPet.query.filter_by(status='approved').order_by(LostPet.id.desc()).all()
+    rejected_pets = LostPet.query.filter_by(status='rejected').order_by(LostPet.id.desc()).all()
+
+    # Pass to template
+    return render_template(
+        'admin_lost.html',
+        user=current_user,
+        pending_pets=pending_pets,
+        approved_pets=approved_pets,
+        rejected_pets=rejected_pets,
+        pending_count=len(pending_pets),
+        approved_count=len(approved_pets),
+        rejected_count=len(rejected_pets)
+    )
+
 
 @app.route('/admin/found_pets')
 @login_required
