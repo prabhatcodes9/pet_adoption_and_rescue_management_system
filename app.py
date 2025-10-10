@@ -338,8 +338,21 @@ def admin_found_pets():
         flash("Access denied!", "danger")
         return redirect(url_for('login'))
 
-    pets = FoundPet.query.order_by(FoundPet.id.desc()).all()
-    return render_template('admin_found.html', pets=pets, user=current_user)
+    pending_pets = FoundPet.query.filter_by(status='pending').order_by(FoundPet.id.desc()).all()
+    approved_pets = FoundPet.query.filter_by(status='approved').order_by(FoundPet.id.desc()).all()
+    rejected_pets = FoundPet.query.filter_by(status='rejected').order_by(FoundPet.id.desc()).all()
+
+    # Pass to template
+    return render_template(
+        'admin_found.html',
+        user=current_user,
+        pending_pets=pending_pets,
+        approved_pets=approved_pets,
+        rejected_pets=rejected_pets,
+        pending_count=len(pending_pets),
+        approved_count=len(approved_pets),
+        rejected_count=len(rejected_pets)
+    )
 
 @app.route('/admin/adopt_pets')
 @login_required
