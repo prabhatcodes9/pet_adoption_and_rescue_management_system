@@ -33,10 +33,12 @@
     </div>
 
     <div class="pet-sections-container">
-        <!-- Pending Section -->
-        <div id="pending" class="pet-grid fade show">
-            {% if pending_pets %}
-                {% for pet in pending_pets %}
+        {% for section, pets, badge in [('pending', pending_pets, 'pending'),
+                                        ('approved', approved_pets, 'approved'),
+                                        ('rejected', rejected_pets, 'rejected')] %}
+        <div id="{{ section }}" class="pet-grid fade {% if section == 'pending' %}show{% endif %}">
+            {% if pets %}
+                {% for pet in pets %}
                 <div class="pet-card">
                     <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
                     <h3>{{ pet.pet_name }}</h3>
@@ -46,84 +48,124 @@
                     <p><strong>Lost Location:</strong> {{ pet.last_seen_location or 'N/A' }}</p>
                     <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
                     <p><strong>Date Lost:</strong> {{ pet.date_lost.strftime('%Y-%m-%d') }}</p>
-                    <p><strong>Status:</strong> <span class="status-badge pending">Pending</span></p>
+                    <p><strong>Status:</strong> <span class="status-badge {{ badge|lower }}">{{ badge|capitalize }}</span></p>
                     <div class="pet-actions">
-                        <a href="{{ url_for('update_lost_status', pet_id=pet.id, action='approve') }}" class="approve-btn">✅ Approve</a>
-                        <a href="{{ url_for('update_lost_status', pet_id=pet.id, action='reject') }}" class="reject-btn">❌ Reject</a>
+                        {% if section == 'pending' %}
+                            <a href="{{ url_for('update_lost_status', pet_id=pet.id, action='approve') }}" class="approve-btn">✅ Approve</a>
+                            <a href="{{ url_for('update_lost_status', pet_id=pet.id, action='reject') }}" class="reject-btn">❌ Reject</a>
+                        {% elif section == 'approved' %}
+                            <a href="#" onclick="openEditModal({{ pet.id }})" class="edit-btn">✏️ Edit</a>
+                            <form action="{{ url_for('delete_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
+                                <button type="submit" class="delete-btn">🗑️ Delete</button>
+                            </form>
+                        {% elif section == 'rejected' %}
+                            <form action="{{ url_for('delete_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
+                                <button type="submit" class="delete-btn">🗑️ Delete</button>
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
             {% else %}
-                <p>No pending pets.</p>
+                <p>No {{ section }} pets.</p>
             {% endif %}
         </div>
-
-        <!-- Approved Section -->
-        <div id="approved" class="pet-grid fade">
-            {% if approved_pets %}
-                {% for pet in approved_pets %}
-                <div class="pet-card">
-                    <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
-                    <h3>{{ pet.pet_name }}</h3>
-                    <p><strong>Type:</strong> {{ pet.pet_type }}</p>
-                    <p><strong>Breed:</strong> {{ pet.breed or 'N/A' }}</p>
-                    <p><strong>Description:</strong> {{ pet.description or 'N/A' }}</p>
-                    <p><strong>Lost Location:</strong> {{ pet.last_seen_location or 'N/A' }}</p>
-                    <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
-                    <p><strong>Date Lost:</strong> {{ pet.date_lost.strftime('%Y-%m-%d') }}</p>
-                    <p><strong>Status:</strong> <span class="status-badge approved">Approved</span></p>
-                    <div class="pet-actions">
-                        <a href="{{ url_for('edit_pet', pet_id=pet.id) }}" class="edit-btn">✏️ Edit</a>
-                        <form action="{{ url_for('delete_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
-                            <button type="submit" class="delete-btn">🗑️ Delete</button>
-                        </form>
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>No approved pets.</p>
-            {% endif %}
-        </div>
-
-        <!-- Rejected Section -->
-        <div id="rejected" class="pet-grid fade">
-            {% if rejected_pets %}
-                {% for pet in rejected_pets %}
-                <div class="pet-card">
-                    <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
-                    <h3>{{ pet.pet_name }}</h3>
-                    <p><strong>Type:</strong> {{ pet.pet_type }}</p>
-                    <p><strong>Breed:</strong> {{ pet.breed or 'N/A' }}</p>
-                    <p><strong>Description:</strong> {{ pet.description or 'N/A' }}</p>
-                    <p><strong>Lost Location:</strong> {{ pet.last_seen_location or 'N/A' }}</p>
-                    <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
-                    <p><strong>Date Lost:</strong> {{ pet.date_lost.strftime('%Y-%m-%d') }}</p>
-                    <p><strong>Status:</strong> <span class="status-badge rejected">Rejected</span></p>
-                    <div class="pet-actions">
-                        <a href="{{ url_for('edit_pet', pet_id=pet.id) }}" class="edit-btn">✏️ Edit</a>
-                        <form action="{{ url_for('delete_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
-                            <button type="submit" class="delete-btn">🗑️ Delete</button>
-                        </form>
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>No rejected pets.</p>
-            {% endif %}
-        </div>
+        {% endfor %}
     </div>
+</div>
+
+<!-- Edit Pet Modal -->
+<div id="editPetModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeEditModal()">&times;</span>
+    <h2>Edit Pet Details</h2>
+    <form id="editPetForm" enctype="multipart/form-data">
+      <input type="hidden" id="edit_pet_id" name="pet_id">
+
+      <label>Pet Name:</label>
+      <input type="text" id="edit_pet_name" name="pet_name" required>
+
+      <label>Pet Type:</label>
+      <input type="text" id="edit_pet_type" name="pet_type" required>
+
+      <label>Breed:</label>
+      <input type="text" id="edit_breed" name="breed">
+
+      <label>Description:</label>
+      <input type="text" id="edit_description" name="description">
+
+      <label>Last Seen Location:</label>
+      <input type="text" id="edit_last_seen_location" name="last_seen_location">
+
+      <label>Contact Number:</label>
+      <input type="text" id="edit_mobile" name="mobile">
+
+      <label>Gender:</label>
+      <select id="edit_gender" name="gender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+
+      <label>Date Lost:</label>
+      <input type="date" id="edit_date_lost" name="date_lost">
+
+      <label>Change Image:</label>
+      <input type="file" id="edit_image" name="image">
+
+      <button type="submit">Save Changes</button>
+    </form>
+  </div>
 </div>
 
 <script>
 function showSection(sectionId) {
-    const sections = document.querySelectorAll('.pet-grid');
-    sections.forEach(s => s.classList.remove('show')); // fade out
-    const target = document.getElementById(sectionId);
-    target.classList.add('show'); // fade in
+  const sections = document.querySelectorAll('.pet-grid');
+  sections.forEach(s => s.classList.remove('show'));
+  document.getElementById(sectionId).classList.add('show');
 }
 
-// Default load = pending
+// Default section
 document.addEventListener('DOMContentLoaded', () => showSection('pending'));
+
+function openEditModal(petId) {
+  fetch(`/admin/edit_pet/${petId}`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('edit_pet_id').value = data.id;
+      document.getElementById('edit_pet_name').value = data.pet_name;
+      document.getElementById('edit_pet_type').value = data.pet_type;
+      document.getElementById('edit_breed').value = data.breed;
+      document.getElementById('edit_description').value = data.description;
+      document.getElementById('edit_last_seen_location').value = data.last_seen_location;
+      document.getElementById('edit_mobile').value = data.mobile;
+      document.getElementById('edit_gender').value = data.gender;
+      document.getElementById('edit_date_lost').value = data.date_lost;
+      document.getElementById('editPetModal').style.display = "block";
+    });
+}
+
+function closeEditModal() {
+  document.getElementById('editPetModal').style.display = "none";
+}
+
+// Submit edited data
+document.getElementById('editPetForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const petId = document.getElementById('edit_pet_id').value;
+  const formData = new FormData(e.target);
+
+  const res = await fetch(`/admin/edit_pet/${petId}`, {
+    method: 'POST',
+    body: formData
+  });
+
+  const result = await res.json();
+  if (result.success) {
+    alert("Pet updated successfully!");
+    closeEditModal();
+    location.reload();
+  }
+});
 </script>
 </body>
 </html>

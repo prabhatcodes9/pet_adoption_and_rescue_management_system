@@ -477,11 +477,27 @@ def update_adopt_status(pet_id, action):
 @login_required
 def edit_pet(pet_id):
     if current_user.role != "admin":
-        flash("Access denied!", "danger")
-        return redirect(url_for('login'))
+        return jsonify({"error": "Access denied"}), 403
 
     pet = LostPet.query.get_or_404(pet_id)
 
+    # --- For modal data loading (AJAX GET request) ---
+    if request.method == 'GET':
+        pet_data = {
+            "id": pet.id,
+            "pet_name": pet.pet_name,
+            "pet_type": pet.pet_type,
+            "breed": pet.breed,
+            "description": pet.description,
+            "last_seen_location": pet.last_seen_location,
+            "mobile": pet.mobile,
+            "gender": pet.gender,
+            "date_lost": pet.date_lost.strftime('%Y-%m-%d') if pet.date_lost else "",
+            "image": pet.image
+        }
+        return jsonify(pet_data)
+
+    # --- For updating pet details via AJAX POST ---
     if request.method == 'POST':
         pet.pet_name = request.form.get('pet_name')
         pet.pet_type = request.form.get('pet_type')
@@ -490,19 +506,24 @@ def edit_pet(pet_id):
         pet.last_seen_location = request.form.get('last_seen_location')
         pet.mobile = request.form.get('mobile')
         pet.gender = request.form.get('gender')
-        pet.date_lost = request.form.get('date_lost')
+
+        date_lost = request.form.get('date_lost')
+        if date_lost:
+            from datetime import datetime
+            try:
+                pet.date_lost = datetime.strptime(date_lost, '%Y-%m-%d')
+            except ValueError:
+                pass
 
         image_file = request.files.get('image')
         if image_file and image_file.filename:
             filename = image_file.filename
-            image_file.save(os.path.join('static/uploads', filename))
+            image_path = os.path.join('static/uploads', filename)
+            image_file.save(image_path)
             pet.image = filename
 
         db.session.commit()
-        flash("Pet updated successfully!", "success")
-        return redirect(url_for('admin_lost_pets'))
-
-    return render_template('edit_pet.html', pet=pet, user=current_user)
+        return jsonify({"success": True, "message": "Pet updated successfully!"})
 
 
 @app.route('/report_lost', methods=['GET', 'POST'])
