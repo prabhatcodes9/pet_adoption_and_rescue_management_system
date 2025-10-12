@@ -53,6 +53,7 @@ class FoundPet(db.Model):
     description = db.Column(db.Text)
     found_location = db.Column(db.String(255))
     date_found = db.Column(db.DateTime, default=datetime.utcnow)
+    date_reported = db.Column(db.DateTime, default=datetime.utcnow)
     mobile = db.Column(db.String(15))
     gender = db.Column(db.String(10))
     image = db.Column(db.String(255))
@@ -524,6 +525,58 @@ def edit_pet(pet_id):
 
         db.session.commit()
         return jsonify({"success": True, "message": "Pet updated successfully!"})
+    
+@app.route('/admin/edit_found_pet/<int:pet_id>', methods=['GET', 'POST'])
+@login_required
+def edit_found_pet(pet_id):
+    if current_user.role != "admin":
+        return jsonify({"error": "Access denied"}), 403
+
+    pet = FoundPet.query.get_or_404(pet_id)
+
+    # --- For modal data loading (AJAX GET request) ---
+    if request.method == 'GET':
+        pet_data = {
+            "id": pet.id,
+            "pet_name": pet.pet_name,
+            "pet_type": pet.pet_type,
+            "breed": pet.breed,
+            "description": pet.description,
+            "found_location": pet.found_location,
+            "mobile": pet.mobile,
+            "gender": pet.gender,
+            "date_found": pet.date_found.strftime('%Y-%m-%d') if pet.date_found else "",
+            "image": pet.image
+        }
+        return jsonify(pet_data)
+
+    # --- For updating pet details via AJAX POST ---
+    if request.method == 'POST':
+        pet.pet_name = request.form.get('pet_name')
+        pet.pet_type = request.form.get('pet_type')
+        pet.breed = request.form.get('breed')
+        pet.description = request.form.get('description')
+        pet.found_location = request.form.get('found_location')
+        pet.mobile = request.form.get('mobile')
+        pet.gender = request.form.get('gender')
+
+        date_found = request.form.get('date_found')
+        if date_found:
+            from datetime import datetime
+            try:
+                pet.date_found = datetime.strptime(date_found, '%Y-%m-%d')
+            except ValueError:
+                pass
+
+        image_file = request.files.get('image')
+        if image_file and image_file.filename:
+            filename = image_file.filename
+            image_path = os.path.join('static/uploads', filename)
+            image_file.save(image_path)
+            pet.image = filename
+
+        db.session.commit()
+        return jsonify({"success": True, "message": "Pet updated successfully!"})
 
 
 @app.route('/report_lost', methods=['GET', 'POST'])
@@ -812,9 +865,9 @@ def move_found_pets_to_adopt():
     while True:
         with app.app_context():
             now = datetime.utcnow()
-            threshold = now - timedelta(minutes=15)
+            threshold = now - timedelta(days=1)
 
-            old_pets = FoundPet.query.filter(FoundPet.date_found < threshold, FoundPet.status=='approved').all()
+            old_pets = FoundPet.query.filter(FoundPet.date_reported < threshold, FoundPet.status=='approved').all()
 
             for pet in old_pets:
                 # Move details to AdoptPet

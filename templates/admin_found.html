@@ -73,7 +73,7 @@
                     <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%Y-%m-%d') }}</p>
                     <p><strong>Status:</strong> <span class="status-badge approved">Approved</span></p>
                     <div class="pet-actions">
-                        <a href="{{ url_for('edit_pet', pet_id=pet.id) }}" class="edit-btn">✏️ Edit</a>
+                        <a href="#" onclick="openEditModal({{ pet.id }})" class="edit-btn">✏️ Edit</a>
                         <form action="{{ url_for('delete_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
                             <button type="submit" class="delete-btn">🗑️ Delete</button>
                         </form>
@@ -100,7 +100,6 @@
                     <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%Y-%m-%d') }}</p>
                     <p><strong>Status:</strong> <span class="status-badge rejected">Rejected</span></p>
                     <div class="pet-actions">
-                        <a href="{{ url_for('edit_pet', pet_id=pet.id) }}" class="edit-btn">✏️ Edit</a>
                         <form action="{{ url_for('delete_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
                             <button type="submit" class="delete-btn">🗑️ Delete</button>
                         </form>
@@ -113,6 +112,48 @@
         </div>
     </div>
 </div>
+<!-- Edit Pet Modal -->
+<div id="editPetModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeEditModal()">&times;</span>
+    <h2>Edit Pet Details</h2>
+    <form id="editPetForm" enctype="multipart/form-data">
+      <input type="hidden" id="edit_pet_id" name="pet_id">
+
+      <label>Pet Name:</label>
+      <input type="text" id="edit_pet_name" name="pet_name" required>
+
+      <label>Pet Type:</label>
+      <input type="text" id="edit_pet_type" name="pet_type" required>
+
+      <label>Breed:</label>
+      <input type="text" id="edit_breed" name="breed">
+
+      <label>Description:</label>
+      <input type="text" id="edit_description" name="description">
+
+      <label>Last Seen Location:</label>
+      <input type="text" id="edit_found_location" name="found_location">
+
+      <label>Contact Number:</label>
+      <input type="text" id="edit_mobile" name="mobile">
+
+      <label>Gender:</label>
+      <select id="edit_gender" name="gender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+
+      <label>Date Lost:</label>
+      <input type="date" id="edit_date_found" name="date_found">
+
+      <label>Change Image:</label>
+      <input type="file" id="edit_image" name="image">
+
+      <button type="submit">Save Changes</button>
+    </form>
+  </div>
+</div>
 
 <script>
 function showSection(sectionId) {
@@ -124,6 +165,46 @@ function showSection(sectionId) {
 
 // Default load = pending
 document.addEventListener('DOMContentLoaded', () => showSection('pending'));
+
+function openEditModal(petId) {
+  fetch(`/admin/edit_found_pet/${petId}`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('edit_pet_id').value = data.id;
+      document.getElementById('edit_pet_name').value = data.pet_name;
+      document.getElementById('edit_pet_type').value = data.pet_type;
+      document.getElementById('edit_breed').value = data.breed;
+      document.getElementById('edit_description').value = data.description;
+      document.getElementById('edit_found_location').value = data.found_location;
+      document.getElementById('edit_mobile').value = data.mobile;
+      document.getElementById('edit_gender').value = data.gender;
+      document.getElementById('edit_date_found').value = data.date_found;
+      document.getElementById('editPetModal').style.display = "block";
+    });
+}
+
+function closeEditModal() {
+  document.getElementById('editPetModal').style.display = "none";
+}
+
+// Submit edited data
+document.getElementById('editPetForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const petId = document.getElementById('edit_pet_id').value;
+  const formData = new FormData(e.target);
+
+  const res = await fetch(`/admin/edit_lost_pet/${petId}`, {
+    method: 'POST',
+    body: formData
+  });
+
+  const result = await res.json();
+  if (result.success) {
+    alert("Pet updated successfully!");
+    closeEditModal();
+    location.reload();
+  }
+});
 </script>
 </body>
 </html>
