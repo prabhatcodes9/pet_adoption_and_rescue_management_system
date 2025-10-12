@@ -42,6 +42,7 @@
                     <h3>{{ pet.pet_name }}</h3>
                     <p><strong>Type:</strong> {{ pet.pet_type }}</p>
                     <p><strong>Breed:</strong> {{ pet.breed or 'N/A' }}</p>
+                    <p><strong>Gender:</strong> {{ pet.gender or 'N/A' }}</p>
                     <p><strong>Description:</strong> {{ pet.description or 'N/A' }}</p>
                     <p><strong>Found Location:</strong> {{ pet.found_location or 'N/A' }}</p>
                     <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
@@ -67,6 +68,7 @@
                     <h3>{{ pet.pet_name }}</h3>
                     <p><strong>Type:</strong> {{ pet.pet_type }}</p>
                     <p><strong>Breed:</strong> {{ pet.breed or 'N/A' }}</p>
+                    <p><strong>Gender:</strong> {{ pet.gender or 'N/A' }}</p>
                     <p><strong>Description:</strong> {{ pet.description or 'N/A' }}</p>
                     <p><strong>Found Location:</strong> {{ pet.found_location or 'N/A' }}</p>
                     <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
@@ -94,6 +96,7 @@
                     <h3>{{ pet.pet_name }}</h3>
                     <p><strong>Type:</strong> {{ pet.pet_type }}</p>
                     <p><strong>Breed:</strong> {{ pet.breed or 'N/A' }}</p>
+                    <p><strong>Gender:</strong> {{ pet.gender or 'N/A' }}</p>
                     <p><strong>Description:</strong> {{ pet.description or 'N/A' }}</p>
                     <p><strong>Found Location:</strong> {{ pet.found_location or 'N/A' }}</p>
                     <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
@@ -193,7 +196,7 @@ document.getElementById('editPetForm').addEventListener('submit', async (e) => {
   const petId = document.getElementById('edit_pet_id').value;
   const formData = new FormData(e.target);
 
-  const res = await fetch(`/admin/edit_lost_pet/${petId}`, {
+  const res = await fetch(`/admin/edit_found_pet/${petId}`, {
     method: 'POST',
     body: formData
   });

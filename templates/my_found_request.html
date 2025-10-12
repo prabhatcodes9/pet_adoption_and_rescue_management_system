@@ -7,7 +7,7 @@
     <meta name="description" content="Connect with loving pets in need of homes. Find lost pets, report found animals, and discover your perfect pet companion through our adoption services.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/report_found.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/my_found_request.css') }}">
 </head>
 <body>
     <!-- Header -->
@@ -58,7 +58,19 @@
                         </p>
 
                         <div class="pet-actions">
-                            <a href="{{ url_for('edit_pet', pet_id=pet.id) }}" class="edit-btn">Edit</a>
+                            <a href="#" class="edit-btn"
+                                data-id="{{ pet.id }}"
+                                data-name="{{ pet.pet_name }}"
+                                data-type="{{ pet.pet_type }}"
+                                data-breed="{{ pet.breed }}"
+                                data-description="{{ pet.description }}"
+                                data-gender="{{ pet.gender }}"
+                                data-date="{{ pet.date_found.strftime('%Y-%m-%d') if pet.date_found else '' }}"
+                                data-location="{{ pet.found_location }}"
+                                data-mobile="{{ pet.mobile }}"
+                                data-status="{{ pet.status }}">
+                                Edit
+                            </a>
                         </div>
                     </div>
                 {% endfor %}
@@ -68,5 +80,77 @@
         </div>
     </div>
     </section>
+    <!-- Edit Pet Modal -->
+<div id="editPetModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Pet Details</h2>
+            <span class="close">&times;</span>
+        </div>
+        <form id="editPetForm" method="POST" action="{{ url_for('update_found_edit') }}" class="modal-form" enctype="multipart/form-data">
+            <input type="hidden" name="pet_id" id="modalPetId">
+
+            <label for="pet_name">Pet Name</label>
+            <input type="text" name="pet_name" id="modalPetName" required>
+
+            <label for="pet_type">Type</label>
+            <input type="text" name="pet_type" id="modalPetType" required>
+
+            <label for="breed">Breed</label>
+            <input type="text" name="breed" id="modalBreed" required>
+
+            <label for="description">Description</label>
+            <textarea name="description" id="modalDescription" required></textarea>
+
+            <label for="gender">Gender</label>
+            <select name="gender" id="modalGender" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+
+            <label for="date_found">Date Found</label>
+            <input type="date" name="date_found" id="modalDateFound" required>
+
+            <label for="found_location">Found Location</label>
+            <input type="text" name="found_location" id="modalfoundlocation" required>
+
+            <label for="mobile">Mobile</label>
+            <input type="text" name="mobile" id="modalMobile" required>
+
+            <label for="image">Pet Image</label>
+            <input type="file" name="image" id="modalImage">
+
+            <button type="submit">Update</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('editPetModal');
+    const closeBtn = modal.querySelector('.close');
+
+    // Close modal
+    closeBtn.onclick = () => modal.style.display = 'none';
+    window.onclick = (e) => { if(e.target == modal) modal.style.display = 'none'; }
+
+    // Populate modal with pet data
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            modal.style.display = 'block';
+            
+            document.getElementById('modalPetId').value = btn.dataset.id;
+            document.getElementById('modalPetName').value = btn.dataset.name;
+            document.getElementById('modalPetType').value = btn.dataset.type;
+            document.getElementById('modalBreed').value = btn.dataset.breed;
+            document.getElementById('modalDescription').value = btn.dataset.description;
+            document.getElementById('modalGender').value = btn.dataset.gender;
+            document.getElementById('modalDateFound').value = btn.dataset.date;
+            document.getElementById('modalfoundlocation').value = btn.dataset.location;
+            document.getElementById('modalMobile').value = btn.dataset.mobile;
+        });
+    });
+</script>
     </body>
 </html>

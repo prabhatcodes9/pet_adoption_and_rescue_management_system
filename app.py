@@ -876,6 +876,39 @@ def update_lost_edit():
     flash("Pet details updated successfully!", "success")
     return redirect(url_for('my_lost_requests'))
 
+@app.route('/update_found_edit', methods=['POST'])
+@login_required
+def update_found_edit():
+    pet_id = request.form.get('pet_id')
+    pet = FoundPet.query.filter_by(id=pet_id, user_id=current_user.id).first()
+
+    if not pet:
+        flash("Pet not found or you are not authorized.", "danger")
+        return redirect(url_for('my_found_request'))
+
+    # Update fields
+    pet.pet_name = request.form.get('pet_name')
+    pet.pet_type = request.form.get('pet_type')
+    pet.breed = request.form.get('breed')
+    pet.description = request.form.get('description')
+    pet.gender = request.form.get('gender')
+    pet.date_found = request.form.get('date_found')
+    pet.found_location = request.form.get('found_location')
+    pet.mobile = request.form.get('mobile')
+
+    # Handle image upload if a new file is selected
+    image_file = request.files.get('image')
+    if image_file and image_file.filename:
+        filename = image_file.filename
+        image_path = os.path.join('static/uploads', filename)
+        image_file.save(image_path)
+        pet.image = filename
+
+    # Commit changes
+    db.session.commit()
+    flash("Pet details updated successfully!", "success")
+    return redirect(url_for('my_found_requests'))
+
 # ----------- Admin User Creation -----------
 with app.app_context():
     admin_email = "admin@petrescue.com"
