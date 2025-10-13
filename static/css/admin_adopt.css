@@ -68,6 +68,7 @@ body {
   padding: 15px;
   transition: transform 0.2s ease;
   text-align: center;
+  overflow: hidden;
 }
 
 .pet-card:hover {

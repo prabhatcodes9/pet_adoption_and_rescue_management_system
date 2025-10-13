@@ -372,20 +372,25 @@ def admin_adopt_pets():
         flash("Access denied!", "danger")
         return redirect(url_for('user_dashboard'))
 
-    # Fetch all adoption requests along with related pets and users
-    requests = db.session.query(
-        AdoptRequest,
-        AdoptPet.pet_name,
-        AdoptPet.pet_type,
-        AdoptPet.breed,
-        User.name.label('user_name'),
-        User.email.label('user_email')
-    ).join(AdoptPet, AdoptRequest.pet_id == AdoptPet.id) \
-     .join(User, AdoptRequest.user_id == User.id) \
-     .order_by(AdoptRequest.id.desc()).all()
-
     pets = AdoptPet.query.order_by(AdoptPet.id.desc()).all()
-    return render_template('admin_adopt.html', requests=requests, user=current_user, pets=pets)
+    pet_data = []
+
+    for pet in pets:
+        requests = db.session.query(
+            AdoptRequest,
+            User.name.label('user_name'),
+            User.email.label('user_email')
+        ).join(User, AdoptRequest.user_id == User.id) \
+         .filter(AdoptRequest.pet_id == pet.id) \
+         .order_by(AdoptRequest.id.desc()) \
+         .all()
+
+        pet_data.append({
+            'pet': pet,
+            'requests': requests
+        })
+
+    return render_template('admin_adopt.html', pet_data=pet_data, user=current_user)
 
 @app.route('/admin/update_lost_status/<int:pet_id>/<string:action>')
 @login_required
