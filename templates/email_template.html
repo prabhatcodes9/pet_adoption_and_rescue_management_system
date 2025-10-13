@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PetConnect Notification</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', Arial, sans-serif;
+      background-color: #f8fafc;
+      color: #2d3748;
+    }
+
+    .email-wrapper {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e2e8f0;
+    }
+
+    .header {
+      background-color: #1f6c5c;
+      text-align: center;
+      color: white;
+      padding: 25px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 26px;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .header p {
+      margin: 5px 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 30px 35px;
+    }
+
+    .content h2 {
+      font-size: 20px;
+      margin-bottom: 15px;
+      color: #1f2937;
+    }
+
+    .content p {
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+      color: #4a5568;
+    }
+
+    .highlight-box {
+      background-color: #f0fdfa;
+      border-left: 4px solid #1f6c5c;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .highlight-box strong {
+      color: #1f6c5c;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: #1f6c5c;
+      color: white !important;
+      text-decoration: none;
+      padding: 12px 25px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .btn:hover {
+      background-color: #195b4f;
+    }
+
+    .footer {
+      background-color: #f1f5f9;
+      text-align: center;
+      font-size: 13px;
+      color: #64748b;
+      padding: 20px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .footer a {
+      color: #1f6c5c;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .paw {
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="header">
+      <h1>🐾 PetConnect</h1>
+      <p>Connecting Pets with Loving Homes</p>
+    </div>
+
+    <div class="content">
+      <h2>Hi {{ user.username }},</h2>
+
+      <div class="highlight-box">
+        <p>{{ message }}</p>
+        <p><strong>Pet:</strong> {{ pet.pet_name }}</p>
+      </div>
+
+      <p>
+        We’re happy to have you as part of the PetConnect family!  
+        Stay connected and help more pets find their perfect homes.
+      </p>
+
+      <a href="#" class="btn">Visit PetConnect</a>
+    </div>
+
+    <div class="footer">
+      <p class="paw">🐾</p>
+      <p>©️ {{ now().year }} PetConnect. All rights reserved.</p>
+      <p>
+        <a href="#">Visit Website</a> |
+        <a href="petconnect99@gmail.com">Contact Support</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

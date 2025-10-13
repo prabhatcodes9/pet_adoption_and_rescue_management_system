@@ -4,3 +4,4 @@ flask-bcrypt
 flask-lohin 
 pymysql 
 flask-wtf
+Flask-Mail

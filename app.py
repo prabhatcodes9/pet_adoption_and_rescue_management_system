@@ -7,9 +7,19 @@ import os
 from flask import jsonify
 import threading
 import time
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.secret_key = 'my-secret-key'
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'petconnect99@gmail.com'  # Replace with your email
+app.config['MAIL_PASSWORD'] = 'riqy pngs rwks xlak'     # Use an App Password (not your Gmail password)
+app.config['MAIL_DEFAULT_SENDER'] = ('PetConnect', 'petconnect99@gmail.com')
+
+mail = Mail(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Prabhat%400@127.0.0.1/pet_rescue_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -151,7 +161,7 @@ def register():
         db.session.commit()
 
         flash('Account created Successfully!')
-        return redirect(url_for('login'))
+        return redirect(url_for('home'))
     
     return redirect(url_for('home'))
 
@@ -819,16 +829,19 @@ def update_adopt_request(req_id, action):
 
     req = AdoptRequest.query.get_or_404(req_id)
     pet = AdoptPet.query.get(req.pet_id)
+    user = User.query.get(req.user_id)
 
     if action == "approve":
         req.status = "approved"
         pet.status = "adopted"  # ✅ update pet to adopted
         message = f"Your adoption request for '{pet.pet_name}' has been approved!"
+        subject = "Adoption Request Approved - PetConnect"
         flash(f"Adoption request for {pet.pet_name} approved!", "success")
 
     elif action == "reject":
         req.status = "rejected"
         message = f"Your adoption request for '{pet.pet_name}' has been rejected."
+        subject = "Adoption Request Approved - PetConnect"
         flash(f"Adoption request for {pet.pet_name} rejected!", "warning")
     else:
         flash("Invalid action.", "danger")
@@ -841,7 +854,16 @@ def update_adopt_request(req_id, action):
     db.session.delete(req)  # Remove request after decision
     db.session.commit()
 
-    return redirect(url_for('admin_adopt'))
+    try:
+        # Send email notification
+        msg = Message(subject, recipients=[user.email])
+        msg.body = f"Hello {user.name},\n\n{message}\n\nThankyou for using PetConnect!"
+        msg.html = render_template('email_template.html', user=user, pet=pet, message=message, now=datetime.utcnow)
+        mail.send(msg)
+    except Exception as e:
+        print(f"❌ Failed to send email: {e}")
+
+    return redirect(url_for('admin_adopt_pets'))
 
 @app.route('/update_lost_edit', methods=['POST'])
 @login_required
@@ -931,7 +953,7 @@ def move_found_pets_to_adopt():
     while True:
         with app.app_context():
             now = datetime.utcnow()
-            threshold = now - timedelta(days=1)
+            threshold = now - timedelta(minutes=5)
 
             old_pets = FoundPet.query.filter(FoundPet.date_reported < threshold, FoundPet.status=='approved').all()
 
