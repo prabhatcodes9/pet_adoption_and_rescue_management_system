@@ -962,6 +962,21 @@ def update_found_edit():
     flash("Pet details updated successfully!", "success")
     return redirect(url_for('my_found_requests'))
 
+@app.route('/update_profile', methods=['POST'])
+@login_required
+def update_profile():
+    name = request.form.get('name')
+    mobile = request.form.get('mobile')
+    address = request.form.get('address')
+
+    current_user.name = name
+    current_user.mobile = mobile
+    current_user.address = address
+    db.session.commit()
+
+    flash("Profile updated successfully!", "success")
+    return redirect(url_for('profile'))
+
 # ----------- Admin User Creation -----------
 with app.app_context():
     admin_email = "admin@petrescue.com"

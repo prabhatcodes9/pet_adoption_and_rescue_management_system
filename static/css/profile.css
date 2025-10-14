@@ -42,3 +42,79 @@ body {
             background-color: #1a5f5e;
             transform: translateY(-1px);
         }
+        /* --- Modal Styling --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+        }
+
+        .modal-content {
+            background: #fff;
+            width: 400px;
+            max-width: 90%;
+            margin: 10% auto;
+            padding: 20px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .close {
+            float: right;
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .modal-content label {
+            display: block;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+
+        .modal-content button {
+            margin-top: 15px;
+            width: 100%;
+            padding: 10px;
+            background: #2b7a78;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .modal-content button:hover {
+            background: #1a5f5e;
+            transform: translateY(-1px);
+        }
+        .btn-update {
+            display: inline-block;
+            background-color: #0077cc;
+            color: white;
+            padding: 10px 18px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
