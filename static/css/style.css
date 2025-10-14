@@ -630,3 +630,15 @@ body {
       font-size: 22px;
       cursor: pointer;
     }
+    .btn-secondary {
+    background-color: #2b7a78;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.btn-secondary:hover {
+    background-color: #1a5f5e;
+    transform: translateY(-1px);
+}

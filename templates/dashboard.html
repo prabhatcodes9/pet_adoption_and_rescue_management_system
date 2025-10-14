@@ -26,6 +26,8 @@
                     <span class="notif-count">{{ unread|length }}</span>
                     {% endif %}
                 </button>
+                <!-- ✅ Profile Button -->
+                <a href="{{ url_for('profile') }}" class="btn btn-secondary">Profile</a>
                 <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
                 </div>
         </div>

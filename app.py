@@ -54,6 +54,8 @@ class LostPet(db.Model):
     image = db.Column(db.String(255))
     status = db.Column(db.String(20), default="pending")
 
+    user = db.relationship('User', backref='lost_pets')
+
 class FoundPet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -68,6 +70,8 @@ class FoundPet(db.Model):
     gender = db.Column(db.String(10))
     image = db.Column(db.String(255))
     status = db.Column(db.String(20), default="pending")
+
+    user = db.relationship('User', backref='found_pets')
 
 class AdoptPet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -191,6 +195,12 @@ def logout():
     logout_user()   # removes current_user
     flash("You have logged out.", "info")
     return redirect(url_for('home'))  # go back to home page (index.html)
+
+@app.route('/profile')
+@login_required
+def profile():
+    user = current_user  # Flask-Login gives access to logged-in user
+    return render_template('profile.html', user=user)
 
 @app.route('/user/dashboard')
 @login_required
@@ -372,8 +382,12 @@ def admin_adopt_pets():
         flash("Access denied!", "danger")
         return redirect(url_for('user_dashboard'))
 
+    # Fetch all pets (we’ll separate them in the template)
     pets = AdoptPet.query.order_by(AdoptPet.id.desc()).all()
+
     pet_data = []
+    pending_count = 0
+    adopted_count = 0
 
     for pet in pets:
         requests = db.session.query(
@@ -390,7 +404,19 @@ def admin_adopt_pets():
             'requests': requests
         })
 
-    return render_template('admin_adopt.html', pet_data=pet_data, user=current_user)
+        if pet.status == 'pending':
+            pending_count += 1 
+        elif pet.status == 'adopted':
+            adopted_count += 1
+
+    return render_template(
+        'admin_adopt.html',
+        pet_data=pet_data,
+        pending_count=pending_count,
+        adopted_count=adopted_count,
+        user=current_user
+    )
+
 
 @app.route('/admin/update_lost_status/<int:pet_id>/<string:action>')
 @login_required
@@ -958,7 +984,7 @@ def move_found_pets_to_adopt():
     while True:
         with app.app_context():
             now = datetime.utcnow()
-            threshold = now - timedelta(minutes=5)
+            threshold = now - timedelta(hours=5)
 
             old_pets = FoundPet.query.filter(FoundPet.date_reported < threshold, FoundPet.status=='approved').all()
 

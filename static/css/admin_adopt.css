@@ -21,7 +21,7 @@ body {
 /* Header Section */
 .dashboard-header {
   display: flex;
-  justify-content: space-between; /* title left, button right */
+  justify-content: space-between; 
   align-items: center;
   border-bottom: 2px solid #e2e8f0;
   margin-bottom: 30px;
@@ -39,7 +39,7 @@ body {
   margin-top: 5px;
 }
 
-/* Back button */
+/* Back Button */
 .back-btn {
   background: #28a745;
   color: #fff;
@@ -54,11 +54,60 @@ body {
   background: #218838;
 }
 
+/* --- Status Cards --- */
+.status-cards {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.status-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  flex: 1 1 200px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s, border 0.2s;
+  border: 2px solid transparent;
+}
+
+.status-card:hover {
+  transform: scale(1.05);
+  background: #f0f8ff;
+}
+
+.status-card.active {
+  border-color: #007bff;
+  background: #e9f3ff;
+}
+
+.status-card h3 {
+  margin: 0;
+  font-size: 1.2em;
+  color: #2d3748;
+}
+
+.status-card span {
+  display: block;
+  margin-top: 10px;
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #007bff;
+}
+
 /* Pet Grid */
 .pet-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+}
+
+.pet-grid.show {
+  display: grid;
 }
 
 .pet-card {
@@ -135,6 +184,53 @@ body {
   background-color: #c82333;
 }
 
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #fff;
+}
+
+.status-badge.pending { background: orange; color: #222; }
+.status-badge.adopted { background: green; }
+.status-badge.rejected { background: red; }
+
+/* Approve / Reject Buttons */
+.approve-btn {
+  background: green;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin-right: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.reject-btn {
+  background: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.approve-btn:hover,
+.reject-btn:hover { opacity: 0.85; }
+
+/* Request Card */
+.request-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  text-align: left;
+  background: #f9f9f9;
+}
+
 /* Responsive Grid */
 @media (max-width: 1024px) {
   .pet-grid {
@@ -156,160 +252,96 @@ body {
   .back-btn {
     align-self: flex-end;
   }
+
+  .status-cards {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
+
+/* Modal Styles (if used) */
 .edit-modal {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 999;
-        }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+}
 
-        /* --- Modal Box --- */
-        .edit-modal-content {
-            background: #fff;
-            border-radius: 12px;
-            padding: 32px;
-            width: 95%;
-            max-width: 550px;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: slideIn 0.3s ease;
-            position: relative;
-        }
+.edit-modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  width: 95%;
+  max-width: 550px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease;
+  position: relative;
+}
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-        /* --- Form Elements --- */
-        .edit-modal-content h2 {
-            text-align: center;
-            color: #2b7a78;
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
+.edit-modal-content h2 {
+  text-align: center;
+  color: #2b7a78;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
 
-        .edit-form .form-group {
-            margin-bottom: 18px;
-        }
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 28px;
+  color: #718096;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
 
-        .edit-form label {
-            font-weight: 600;
-            display: block;
-            margin-bottom: 6px;
-            color: #2d3748;
-        }
+.close-btn:hover {
+  color: #2d3748;
+}
 
-        .edit-form input,
-        .edit-form select,
-        .edit-form textarea {
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: 2px solid #e2e8f0;
-            font-size: 15px;
-            transition: border-color 0.2s ease;
-        }
+/* Image Preview */
+.image-preview {
+  width: 120px;
+  height: 120px;
+  border: 2px dashed #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-top: 10px;
+  background: #f7fafc;
+}
 
-        .edit-form input:focus,
-        .edit-form textarea:focus,
-        .edit-form select:focus {
-            border-color: #2b7a78;
-            outline: none;
-        }
-
-        .edit-form textarea {
-            resize: none;
-            min-height: 90px;
-        }
-
-        /* --- Buttons --- */
-        .modal-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
-        }
-
-        .modal-actions .btn {
-            width: 48%;
-        }
-
-        /* --- Image Preview --- */
-        .image-preview {
-            width: 120px;
-            height: 120px;
-            border: 2px dashed #e2e8f0;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            margin-top: 10px;
-            background: #f7fafc;
-        }
-
-        .image-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* --- Close Button --- */
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 28px;
-            color: #718096;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .close-btn:hover {
-            color: #2d3748;
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 0.9em;
-            font-weight: bold;
-        }
-        .pending { background-color: #ffcc00; color: #222; }
-        .approved { background-color: #28a745; color: white; }
-        .rejected { background-color: #dc3545; color: white; }
-
-        .approve-btn {
-            background-color: #28a745;
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Tab highlight effect */
+        .status-card.active {
+            background-color: whitesmoke;
             color: white;
-            padding: 6px 10px;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
-            margin-right: 5px;
-            cursor: pointer;
+            transform: scale(1.05);
+            transition: 0.3s ease;
         }
-        .reject-btn {
-            background-color: #dc3545;
-            color: white;
-            padding: 6px 10px;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
-            cursor: pointer;
+
+        .pet-grid {
+            display: none;
         }
-        .approve-btn:hover, .reject-btn:hover { opacity: 0.85; }
-        .request-card { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
-        .status-badge { padding: 3px 7px; border-radius: 5px; color: #fff; font-size: 0.85rem; }
-        .status-badge.pending { background: orange; }
-        .status-badge.adopted { background: green; }
-        .status-badge.rejected { background: red; }
-        .approve-btn { background: green; color: white; border: none; padding: 5px 10px; margin-right: 5px; cursor: pointer; }
-        .reject-btn { background: red; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+
+        .pet-grid.show {
+            display: grid;
+        }

@@ -49,6 +49,10 @@
                     <p><strong>Lost Location:</strong> {{ pet.last_seen_location or 'N/A' }}</p>
                     <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
                     <p><strong>Date Lost:</strong> {{ pet.date_lost.strftime('%Y-%m-%d') }}</p>
+                    <p><strong>Reported By:</strong>
+                        {{ pet.user.name if pet.user else 'Unknown' }}
+                        ({{ pet.user.email if pet.user else 'N/A' }})
+                    </p>
                     <p><strong>Status:</strong> <span class="status-badge {{ badge|lower }}">{{ badge|capitalize }}</span></p>
                     <div class="pet-actions">
                         {% if section == 'pending' %}
