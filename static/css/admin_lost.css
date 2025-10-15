@@ -532,3 +532,75 @@ body {
     width: 100%;
   }
 }
+.pet-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 15px;
+  text-align: left;
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pet-card:hover {
+  transform: translateY(-5px);
+}
+
+.pet-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.pet-card h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2d3748;
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.pet-info,
+.pet-description,
+.pet-reported {
+  font-size: 0.95rem;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+.pet-info p,
+.pet-description p,
+.pet-reported p {
+  margin: 3px 0;
+}
+
+.pet-card hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 8px 0;
+}
+
+.pet-footer {
+  margin-top: 10px;
+  text-align: center;
+}
+.pet-info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.pet-info-row p {
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+}
+
+.pet-info-row p strong {
+  color: #2d3748;
+}

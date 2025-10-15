@@ -40,21 +40,31 @@
                 <div class="pet-card">
                     <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
                     <h3>{{ pet.pet_name }}</h3>
+                    <div class="pet-info-row">
                     <p><strong>Type:</strong> {{ pet.pet_type }}</p>
                     <p><strong>Breed:</strong> {{ pet.breed or 'N/A' }}</p>
+                    </div>
+                    <div class="pet-info-row">
                     <p><strong>Gender:</strong> {{ pet.gender or 'N/A' }}</p>
+                    <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                    <hr>
+                    <div class="pet-description">
                     <p><strong>Description:</strong> {{ pet.description or 'N/A' }}</p>
                     <p><strong>Found Location:</strong> {{ pet.found_location or 'N/A' }}</p>
-                    <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
-                    <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%Y-%m-%d') }}</p>
-                    <p><strong>Reported By:</strong>
-                        {{ pet.user.name if pet.user else 'Unknown' }}
-                        ({{ pet.user.email if pet.user else 'N/A' }})
-                    </p>
+                    </div>
+                    <hr>
+                    <div class="pet-reported">
+                        <p><strong>Reported By:</strong> {{ pet.user.name if pet.user else 'Unknown' }}</p>
+                        <p><strong>Email:</strong> {{ pet.user.email if pet.user else 'N/A' }}</p>
+                        <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
+                    </div>
+                    <div class="pet-footer">
                     <p><strong>Status:</strong> <span class="status-badge pending">Pending</span></p>
                     <div class="pet-actions">
                         <a href="{{ url_for('update_found_status', pet_id=pet.id, action='approve') }}" class="approve-btn">✅ Approve</a>
                         <a href="{{ url_for('update_found_status', pet_id=pet.id, action='reject') }}" class="reject-btn">❌ Reject</a>
+                    </div>
                     </div>
                 </div>
                 {% endfor %}
@@ -70,23 +80,33 @@
                 <div class="pet-card">
                     <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
                     <h3>{{ pet.pet_name }}</h3>
+                    <div class="pet-info-row">
                     <p><strong>Type:</strong> {{ pet.pet_type }}</p>
                     <p><strong>Breed:</strong> {{ pet.breed or 'N/A' }}</p>
+                    </div>
+                    <div class="pet-info-row">
                     <p><strong>Gender:</strong> {{ pet.gender or 'N/A' }}</p>
+                    <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                    <hr>
+                    <div class="pet-description">
                     <p><strong>Description:</strong> {{ pet.description or 'N/A' }}</p>
                     <p><strong>Found Location:</strong> {{ pet.found_location or 'N/A' }}</p>
-                    <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
-                    <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%Y-%m-%d') }}</p>
-                    <p><strong>Reported By:</strong>
-                        {{ pet.user.name if pet.user else 'Unknown' }}
-                        ({{ pet.user.email if pet.user else 'N/A' }})
-                    </p>
+                    </div>
+                    <hr>
+                    <div class="pet-reported">
+                        <p><strong>Reported By:</strong> {{ pet.user.name if pet.user else 'Unknown' }}</p>
+                        <p><strong>Email:</strong> {{ pet.user.email if pet.user else 'N/A' }}</p>
+                        <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
+                    </div>
+                    <div class="pet-footer">
                     <p><strong>Status:</strong> <span class="status-badge approved">Approved</span></p>
                     <div class="pet-actions">
                         <a href="#" onclick="openEditModal({{ pet.id }})" class="edit-btn">✏️ Edit</a>
-                        <form action="{{ url_for('delete_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
+                        <form action="{{ url_for('delete_found_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
                             <button type="submit" class="delete-btn">🗑️ Delete</button>
                         </form>
+                    </div>
                     </div>
                 </div>
                 {% endfor %}
@@ -102,22 +122,32 @@
                 <div class="pet-card">
                     <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
                     <h3>{{ pet.pet_name }}</h3>
+                    <div class="pet-info-row">
                     <p><strong>Type:</strong> {{ pet.pet_type }}</p>
                     <p><strong>Breed:</strong> {{ pet.breed or 'N/A' }}</p>
+                    </div>
+                    <div class="pet-info-row">
                     <p><strong>Gender:</strong> {{ pet.gender or 'N/A' }}</p>
+                    <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                    <hr>
+                    <div class="pet-description">
                     <p><strong>Description:</strong> {{ pet.description or 'N/A' }}</p>
                     <p><strong>Found Location:</strong> {{ pet.found_location or 'N/A' }}</p>
-                    <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
-                    <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%Y-%m-%d') }}</p>
-                    <p><strong>Reported By:</strong>
-                        {{ pet.user.name if pet.user else 'Unknown' }}
-                        ({{ pet.user.email if pet.user else 'N/A' }})
-                    </p>
+                    </div>
+                    <hr>
+                    <div class="pet-reported">
+                        <p><strong>Reported By:</strong> {{ pet.user.name if pet.user else 'Unknown' }}</p>
+                        <p><strong>Email:</strong> {{ pet.user.email if pet.user else 'N/A' }}</p>
+                        <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
+                    </div>
+                    <div class="pet-footer">
                     <p><strong>Status:</strong> <span class="status-badge rejected">Rejected</span></p>
                     <div class="pet-actions">
-                        <form action="{{ url_for('delete_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
+                        <form action="{{ url_for('delete_found_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
                             <button type="submit" class="delete-btn">🗑️ Delete</button>
                         </form>
+                    </div>
                     </div>
                 </div>
                 {% endfor %}

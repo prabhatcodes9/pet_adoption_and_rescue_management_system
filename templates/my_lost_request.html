@@ -33,18 +33,27 @@
         <div class="cards-grid">
             {% if pets %}
                 {% for pet in pets %}
-                    <div class="pet-image">
+                    <div class="pet-card">
                         <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
-                    </div>
-                    <div class="pet-details">
                         <h3>{{ pet.pet_name }}</h3>
+                        <div class="pet-info-row">
                         <p><strong>Type:</strong> {{ pet.pet_type }}</p>
                         <p><strong>Breed:</strong> {{ pet.breed }}</p>
-                        <p><strong>Description:</strong> {{ pet.description }}</p>
+                        </div>
+                        <div class="pet-info-row">
                         <p><strong>Gender:</strong> {{ pet.gender }}</p>
                         <p><strong>Date Lost:</strong> {{ pet.date_lost.strftime('%d %B %Y') if pet.date_lost else 'N/A' }}</p>
+                        </div>
+                        <hr>
+                        <div class="pet-description">
+                        <p><strong>Description:</strong> {{ pet.description }}</p>
                         <p><strong>Last Seen:</strong> {{ pet.last_seen_location }}</p>
+                        </div>
+                        <hr>
+                        <div class="pet-reported">
                         <p><strong>Mobile:</strong> {{ pet.mobile }}</p>
+                        </div>
+                        <div class="pet-footer">
                         <p><strong>Status:</strong>
                             {% if pet.status == 'approved' %}
                                 <span class="status approved">Approved</span>
@@ -57,7 +66,7 @@
                             {% endif %}
                         </p>
 
-                        <div class="pet-actions">
+                        <div class="edit-btn-info">
                             <a href="#" class="edit-btn"
                                 data-id="{{ pet.id }}"
                                 data-name="{{ pet.pet_name }}"
@@ -71,6 +80,7 @@
                                 data-status="{{ pet.status }}">
                                 Edit
                             </a>
+                        </div>
                         </div>
                     </div>
                 {% endfor %}
