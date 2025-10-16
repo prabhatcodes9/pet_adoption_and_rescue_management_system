@@ -289,3 +289,17 @@ body {
         width: 100%;
     }
 }
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #ff7b51, #8bc6ec);
+  padding: 12px 40px;
+  color: #fff;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

@@ -181,7 +181,7 @@ def login():
             login_user(user)
             flash('Login Successfully!')
             if user.role == 'admin':
-                return redirect(url_for('admin_dashboard'))
+                return redirect(url_for('admin_home'))
             else:
                 return redirect(url_for('user_dashboard'))
         else:
@@ -225,6 +225,33 @@ def mark_notifications_read():
     Notification.query.filter_by(user_id=current_user.id, is_read=False).update({'is_read': True})
     db.session.commit()
     return jsonify({"success": True})
+
+@app.route('/admin/home')
+@login_required
+def admin_home():
+    if current_user.role != "admin":
+        flash("Access denied!", "danger")
+        return redirect(url_for('login'))
+
+    # --- Counts ---
+    lost_count = LostPet.query.filter_by(status='approved').count()
+    found_count = FoundPet.query.filter_by(status='approved').count()
+    adopt_count = AdoptPet.query.filter_by(status='pending').count()
+    total_pets = lost_count + found_count + adopt_count
+
+    total_users = User.query.filter_by(role='user').count()  # only normal users
+    pending_requests = AdoptRequest.query.filter_by(status='pending').count()
+
+    return render_template(
+        'admin_index.html',
+        user=current_user,
+        lost_count=lost_count,
+        found_count=found_count,
+        adopt_count=adopt_count,
+        total_pets=total_pets,
+        total_users=total_users,
+        pending_requests=pending_requests
+    )
 
 @app.route('/admin/dashboard')
 @login_required

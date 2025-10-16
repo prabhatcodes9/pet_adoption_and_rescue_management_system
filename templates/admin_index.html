@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Pet Welfare Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_index.css') }}">
+</head>
+<body>
+  <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🐾</span>
+                    <h1 class="logo-text">Welcome {{ user.name }} !</h1>
+                </div>
+                <nav class="header-nav">
+                <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+  <!-- Header Section -->
+  <section class="admin-header">
+    <div class="admin-badge">Administrator</div>
+    <h1>Admin Dashboard</h1>
+    <p>Manage the Pet Welfare Hub platform and oversee all pet listings and user activities.</p>
+    <div class="admin-actions">
+      <button class="btn manage" onclick="window.location.href='{{ url_for('admin_dashboard') }}'">
+        Manage Pets
+    </button>
+      <button class="btn requests">Adoption Requests </button>
+    </div>
+  </section>
+
+  <!-- Dashboard Stats -->
+  <section class="dashboard-grid">
+  <div class="card orange">
+    <div class="card-content">
+      <div class="icon">🐾</div>
+      <div class="info">
+        <h2 id="totalPets">{{ total_pets }}</h2>
+        <p>Total Pets</p>
+        <small>All Pet Listings</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="card green">
+    <div class="card-content">
+      <div class="icon">💚</div>
+      <div class="info">
+        <h2 id="adoptPets">{{ adopt_count }}</h2>
+        <p>For Adoption</p>
+        <small>Available for Adoption</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="card red">
+    <div class="card-content">
+      <div class="icon">🔍</div>
+      <div class="info">
+        <h2 id="lostPets">{{ lost_count }}</h2>
+        <p>Lost Pets</p>
+        <small>Need Help</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="card blue">
+    <div class="card-content">
+      <div class="icon">📍</div>
+      <div class="info">
+        <h2 id="foundPets">{{ found_count }}</h2>
+        <p>Found Pets</p>
+        <small>Awaiting Owners</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="card teal">
+    <div class="card-content">
+      <div class="icon">👥</div>
+      <div class="info">
+        <h2>{{ total_users }}</h2>
+        <p>Registered Users</p>
+        <small>Community Members</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="card yellow">
+    <div class="card-content">
+      <div class="icon">⏳</div>
+      <div class="info">
+        <h2>{{ pending_requests }}</h2>
+        <p>Pending Requests</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <script>
+
+  </script>
+</body>
+</html>
