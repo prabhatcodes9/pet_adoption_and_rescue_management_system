@@ -868,15 +868,35 @@ def update_request_status(req_id):
     flash(f"Request has been {status}.", "success")
     return redirect(url_for('my_adopt_requests'))
 
-@app.route('/admin/adopt_requests')
+@app.route("/admin/adopt_requests")
 @login_required
 def admin_adopt_requests():
     if current_user.role != "admin":
         flash("Access denied!", "danger")
-        return redirect(url_for('login'))
+        return redirect(url_for('user_dashboard'))
 
-    requests = AdoptRequest.query.order_by(AdoptRequest.id.desc()).all()
-    return render_template('admin_adopt.html', requests=requests, user=current_user)
+    pets = AdoptPet.query.order_by(AdoptPet.id.desc()).all()
+    pet_data = []
+
+    for pet in pets:
+        # Join adopt requests and user info
+        requests = db.session.query(
+            AdoptRequest,
+            User.name.label('user_name'),
+            User.email.label('user_email')
+        ).join(User, AdoptRequest.user_id == User.id) \
+         .filter(AdoptRequest.pet_id == pet.id) \
+         .order_by(AdoptRequest.id.desc()).all()
+
+        pet_data.append({
+            "id": pet.id,
+            "name": pet.pet_name,
+            "type": pet.pet_type,
+            "requests": requests
+        })
+
+    return render_template("admin_adopt_requests.html", pets=pet_data)
+
 
 @app.route('/admin/update_adopt_request/<int:req_id>/<string:action>', methods=['POST'])
 @login_required
@@ -903,7 +923,7 @@ def update_adopt_request(req_id, action):
         flash(f"Adoption request for {pet.pet_name} rejected!", "warning")
     else:
         flash("Invalid action.", "danger")
-        return redirect(url_for('admin_adopt'))
+        return redirect(url_for('admin_adopt_requests'))
 
     # Create notification for the requester
     notif = Notification(user_id=req.user_id, message=message)
@@ -921,7 +941,7 @@ def update_adopt_request(req_id, action):
     except Exception as e:
         print(f"❌ Failed to send email: {e}")
 
-    return redirect(url_for('admin_adopt_pets'))
+    return redirect(url_for('admin_adopt_requests'))
 
 @app.route('/update_lost_edit', methods=['POST'])
 @login_required

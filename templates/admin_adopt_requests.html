@@ -1,0 +1,76 @@
+<!-- templates/admin_adopt_requests.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adoption Requests - Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_adopt_request.css') }}">
+    <script>
+        function removeRequestCard(event, form) {
+            event.preventDefault();
+
+            fetch(form.action, {
+                method: "POST",
+                body: new FormData(form)
+            })
+            .then(response => {
+                if (response.ok) {
+                    form.closest(".request-card").remove();
+                } else {
+                    alert("Failed to update request!");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header class="dashboard-header">
+            <h2>Adoption Requests</h2>
+            <a href="{{ url_for('admin_home') }}" class="back-btn">← Back to Dashboard</a>
+        </header>
+
+        <div class="requests-section">
+        {% if pets %}
+        <div class="requests-grid">
+            {% for item in pets %}
+                {% if item.requests %}
+                    {% for req, user_name, user_email in item.requests %}
+                        <div class="request-card">
+                            <h3 class="pet-title">{{ item.name }} <span>({{ item.type }})</span></h3>
+
+                            <p><strong>Requested By:</strong> {{ user_name }} ({{ user_email }})</p>
+                            <p><strong>Reason:</strong> {{ req.reason }}</p>
+                            <p><strong>Contact:</strong> {{ req.mobile }}</p>
+                            <p><strong>Address:</strong> {{ req.address }}</p>
+
+                            {% if req.status == 'pending' %}
+                                <form method="POST" action="{{ url_for('update_adopt_request', req_id=req.id, action='approve') }}" onsubmit="removeRequestCard(event, this);" style="display:inline;">
+                                    <button type="submit" class="approve-btn">✅ Approve</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('update_adopt_request', req_id=req.id, action='reject') }}" onsubmit="removeRequestCard(event, this);" style="display:inline;">
+                                    <button type="submit" class="reject-btn">❌ Reject</button>
+                                </form>
+                            {% else %}
+                                <p><strong>Status:</strong>
+                                    {% if req.status == 'approved' %}
+                                        <span style="color:green;">Adopted</span>
+                                    {% elif req.status == 'rejected' %}
+                                        <span style="color:red;">Rejected</span>
+                                    {% endif %}
+                                </p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No adoption requests found.</p>
+    {% endif %}
+</div>
+    </div>
+</body>
+</html>
