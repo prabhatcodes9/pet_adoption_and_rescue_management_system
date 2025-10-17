@@ -892,6 +892,11 @@ def admin_adopt_requests():
             "id": pet.id,
             "name": pet.pet_name,
             "type": pet.pet_type,
+            "breed": pet.breed,           # added
+            "location": pet.location,   # added
+            "gender": pet.gender,     # added
+            "description": pet.description,   # added
+            "image": pet.image,      # added (if you store image filename)
             "requests": requests
         })
 

@@ -8,7 +8,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_adopt_request.css') }}">
     <script>
         function removeRequestCard(event, form) {
-            event.preventDefault();
+            event.preventDefault(); // stop normal form submission
+
+            const button = form.querySelector("button");
+            button.disabled = true; // prevent double clicks
 
             fetch(form.action, {
                 method: "POST",
@@ -16,13 +19,48 @@
             })
             .then(response => {
                 if (response.ok) {
+                    // remove card instantly after success
                     form.closest(".request-card").remove();
                 } else {
                     alert("Failed to update request!");
+                    button.disabled = false; // re-enable if failed
                 }
             })
-            .catch(error => console.error("Error:", error));
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred!");
+                button.disabled = false; // re-enable in case of error
+            });
         }
+
+        // Modal JS
+        document.addEventListener("DOMContentLoaded", () => {
+            const modal = document.getElementById("petDetailModal");
+            const modalClose = modal.querySelector(".close");
+
+            document.querySelectorAll(".view-detail-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    document.getElementById("modal-name").textContent = btn.dataset.name;
+                    document.getElementById("modal-type").textContent = btn.dataset.type;
+                    document.getElementById("modal-breed").textContent = btn.dataset.breed;
+                    document.getElementById("modal-location").textContent = btn.dataset.location;
+                    document.getElementById("modal-gender").textContent = btn.dataset.gender;
+                    document.getElementById("modal-description").textContent = btn.dataset.description;
+
+                    if(btn.dataset.image) {
+                        document.getElementById("modal-image").src = btn.dataset.image;
+                        document.getElementById("modal-image").style.display = "block";
+                    } else {
+                        document.getElementById("modal-image").style.display = "none";
+                    }
+
+                    modal.style.display = "block";
+                });
+            });
+
+            modalClose.onclick = () => modal.style.display = "none";
+            window.onclick = (e) => { if(e.target === modal) modal.style.display = "none"; };
+        });
     </script>
 </head>
 <body>
@@ -46,12 +84,24 @@
                             <p><strong>Contact:</strong> {{ req.mobile }}</p>
                             <p><strong>Address:</strong> {{ req.address }}</p>
 
+                            <!-- View Details Button -->
+                            <button class="view-detail-btn"
+                                data-name="{{ item.name }}"
+                                data-type="{{ item.type }}"
+                                data-breed="{{ item.breed }}"
+                                data-location="{{ item.location }}"
+                                data-gender="{{ item.gender }}"
+                                data-description="{{ item.description }}"
+                                {% if item.image %} data-image="{{ url_for('static', filename='uploads/' + item.image) }}" {% endif %}>
+                                View Pet Details
+                            </button>
+
                             {% if req.status == 'pending' %}
                                 <form method="POST" action="{{ url_for('update_adopt_request', req_id=req.id, action='approve') }}" onsubmit="removeRequestCard(event, this);" style="display:inline;">
-                                    <button type="submit" class="approve-btn">✅ Approve</button>
+                                    <button type="submit" class="approve-btn">Approve</button>
                                 </form>
                                 <form method="POST" action="{{ url_for('update_adopt_request', req_id=req.id, action='reject') }}" onsubmit="removeRequestCard(event, this);" style="display:inline;">
-                                    <button type="submit" class="reject-btn">❌ Reject</button>
+                                    <button type="submit" class="reject-btn">Reject</button>
                                 </form>
                             {% else %}
                                 <p><strong>Status:</strong>
@@ -71,6 +121,20 @@
         <p>No adoption requests found.</p>
     {% endif %}
 </div>
+    </div>
+
+    <!-- Pet Detail Modal -->
+    <div id="petDetailModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modal-image" src="" alt="Pet Image" style="display:none;">
+            <h2 id="modal-name"></h2>
+            <p><strong>Type:</strong> <span id="modal-type"></span></p>
+            <p><strong>Breed:</strong> <span id="modal-breed"></span></p>
+            <p><strong>Location:</strong> <span id="modal-location"></span></p>
+            <p><strong>Gender:</strong> <span id="modal-gender"></span></p>
+            <p><strong>Description:</strong> <span id="modal-description"></span></p>
+        </div>
     </div>
 </body>
 </html>
