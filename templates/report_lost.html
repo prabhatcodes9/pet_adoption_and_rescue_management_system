@@ -92,6 +92,49 @@
     </div>
   </div>
 
+  <!-- Found Pet Modal -->
+<div id="foundModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>🐶 Where You Found</h2>
+      <span class="close" id="closeFoundModal">&times;</span>
+    </div>
+
+    <form id="foundForm" class="modal-form" method="POST" enctype="multipart/form-data">
+      <input type="hidden" id="found_pet_id" name="pet_id">
+
+      <div class="form-group">
+        <label for="finder_name">Name</label>
+        <input type="text" id="finder_name" name="name" placeholder="Enter your name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="finder_address">Address</label>
+        <input type="text" id="finder_address" name="address" placeholder="Enter your address" required>
+      </div>
+
+      <div class="form-group">
+        <label for="finder_mobile">Mobile</label>
+        <input type="tel" id="finder_mobile" name="mobile" placeholder="Enter your mobile number" required>
+      </div>
+
+      <div class="form-group">
+        <label for="finder_description">Description</label>
+        <textarea id="finder_description" name="description" placeholder="Describe where and how you found this pet..." rows="4" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="finder_image">Upload Pet Photo</label>
+        <input type="file" id="finder_image" name="image" accept="images/*" required>
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary btn-full">Submit Found Report</button>
+      </div>
+    </form>
+  </div>
+</div>
+
     <!-- Lost Pets List -->
      <section class="lost-pets-section">
         <div class="container">
@@ -115,6 +158,12 @@
                 <p><strong>Date Lost:</strong> {{ pet.date_lost.strftime('%d %B %Y') if pet.date_lost else 'N/A' }}</p>
                 <p><strong>Last Seen Location:</strong> {{ pet.last_seen_location }}</p>
                 <p><strong>Contact:</strong> {{ pet.mobile }}</p>
+
+                {% if pet.pet_status == 'Founded' %}
+                  <p class="founded-status"><strong>🐾 Founded by Owner</strong></p>
+                {% elif current_user.id != pet.user_id %}
+                  <button class="btn btn-secondary report-found-btn" data-pet-id="{{ pet.id }}">I Found This Pet</button>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
@@ -142,6 +191,32 @@
         modal.style.display = "none";
       }
     });
+    // Existing modal scripts remain above
+
+  const foundModal = document.getElementById("foundModal");
+  const closeFoundModal = document.getElementById("closeFoundModal");
+  const foundBtns = document.querySelectorAll(".report-found-btn");
+  const foundForm = document.getElementById("foundForm");
+  const foundPetIdInput = document.getElementById("found_pet_id");
+
+  foundBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const petId = btn.getAttribute("data-pet-id");
+      foundPetIdInput.value = petId;
+      foundForm.action = `/submit_found_request/${petId}`; // route in Flask
+      foundModal.style.display = "block";
+    });
+  });
+
+  closeFoundModal.addEventListener("click", () => {
+    foundModal.style.display = "none";
+  });
+
+  window.addEventListener("click", (e) => {
+    if (e.target === foundModal) {
+      foundModal.style.display = "none";
+    }
+  });
   </script>
   </body>
 </html>

@@ -1,0 +1,287 @@
+/* ===============================
+   General Page Styles
+================================= */
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    color: #2d3748;
+    background-color: #fafafa;
+    font-size: 16px;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+/* ===============================
+   Header
+================================= */
+/* Header Styles */
+.header {
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo-icon {
+    font-size: 28px;
+}
+
+.logo-text {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2b7a78;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #ff7b51, #8bc6ec);
+  padding: 12px 40px;
+  color: #fff;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.nav-left nav a {
+  color: #fff;
+  text-decoration: none;
+  margin-right: 18px;
+  font-weight: 500;
+}
+
+.nav-left nav a.active,
+.nav-left nav a:hover {
+  text-decoration: underline;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logout-btn, .theme-toggle {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.logout-btn:hover, .theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ===============================
+   Section
+================================= */
+
+.section-title {
+  text-align: center;
+  color: #2b7a78;
+  font-size: 1.6rem;
+  margin-bottom: 30px;
+}
+
+/* ===============================
+   Pet Card Layout
+================================= */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* exactly 3 cards per row */
+  gap: 24px;
+  justify-items: center;
+}
+
+.pet-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.pet-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+@media (max-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ===============================
+   Image Section
+================================= */
+.pet-image img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+/* ===============================
+   Details Section
+================================= */
+.pet-details {
+  padding: 15px 18px;
+}
+
+.pet-details h3 {
+  margin: 0 0 8px;
+  color: #2b7a78;
+  font-size: 1.2rem;
+}
+
+.pet-details p {
+  margin: 6px 0;
+  font-size: 0.95rem;
+}
+
+/* ===============================
+   Status Styles
+================================= */
+.status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status.approved {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ===============================
+   Action Buttons
+================================= */
+.pet-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px;
+  border-top: 1px solid #eee;
+}
+
+.btn {
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 14px;
+  transition: all 0.25s;
+}
+
+.approve-btn {
+  background: #16a34a;
+  color: white;
+}
+
+.approve-btn:hover {
+  background: #15803d;
+}
+
+.reject-btn {
+  background: #dc2626;
+  color: white;
+}
+
+.reject-btn:hover {
+  background: #b91c1c;
+}
+
+.delete-btn {
+  background: #6b7280;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #4b5563;
+}
+
+/* ===============================
+   No Data
+================================= */
+.no-data {
+  text-align: center;
+  color: #666;
+  font-size: 1.1rem;
+  margin-top: 60px;
+}
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 350;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background-color: #2b7a78;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #1a5f5e;
+    transform: translateY(-1px);
+}

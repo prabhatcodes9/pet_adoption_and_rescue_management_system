@@ -151,6 +151,7 @@ body {
 
 .manage { background: #e86a3a; transform: translateY(-1px); }
 .requests { background: #f6b23c; position: relative; transform: translateY(-1px); }
+.lostfound { background: #4a90e2; transform: translateY(-1px); }
 .users { background: #72c293; }
 
 .badge {

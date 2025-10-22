@@ -8,6 +8,8 @@ from flask import jsonify
 import threading
 import time
 from flask_mail import Mail, Message
+from werkzeug.utils import secure_filename
+from flask_apscheduler import APScheduler
 
 app = Flask(__name__)
 app.secret_key = 'my-secret-key'
@@ -18,6 +20,8 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'petconnect99@gmail.com'  # Replace with your email
 app.config['MAIL_PASSWORD'] = 'riqy pngs rwks xlak'     # Use an App Password (not your Gmail password)
 app.config['MAIL_DEFAULT_SENDER'] = ('PetConnect', 'petconnect99@gmail.com')
+
+schedular = APScheduler()
 
 mail = Mail(app)
 
@@ -53,6 +57,8 @@ class LostPet(db.Model):
     gender = db.Column(db.String(10))
     image = db.Column(db.String(255))
     status = db.Column(db.String(20), default="pending")
+    pet_status = db.Column(db.String(20), default="lost")
+    founded_at = db.Column(db.DateTime, nullable=True)
 
     user = db.relationship('User', backref='lost_pets')
 
@@ -98,6 +104,20 @@ class AdoptRequest(db.Model):
     request_date = db.Column(db.Date)
     reason = db.Column(db.Text)
     status = db.Column(db.String(20), default="pending")
+
+class FoundRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    pet_id = db.Column(db.Integer, db.ForeignKey('lost_pet.id'), nullable=False)
+    finder_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    address = db.Column(db.String(255), nullable=False)
+    mobile = db.Column(db.String(15), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    image = db.Column(db.String(255))
+    status = db.Column(db.String(20), default='pending')
+    date_reported = db.Column(db.DateTime, default=datetime.utcnow)
+
+    pet = db.relationship('LostPet', backref='found_requests')
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -676,7 +696,8 @@ def report_lost():
             mobile=mobile,
             gender=gender,
             image=filename,
-            status="pending"
+            status="pending",
+            pet_status="lost"
         )
         db.session.add(new_pet)
         db.session.commit()
@@ -790,11 +811,82 @@ def my_found_requests():
     pets = FoundPet.query.filter_by(user_id=user_id).all()
     return render_template('my_found_request.html',user=current_user, pets=pets)
 
+@app.route('/submit_found_request/<int:pet_id>', methods=['POST'])
+@login_required
+def submit_found_request(pet_id):
+    name = request.form.get('name')
+    address = request.form.get('address')
+    mobile = request.form.get('mobile')
+    description = request.form.get('description')
+    image_file = request.files.get('image')
+
+    if image_file and image_file.filename != "":
+        safe_filename = secure_filename(image_file.filename)
+        image_path = os.path.join('static/images', safe_filename)
+        image_file.save(image_path)
+    else:
+        safe_filename = None
+
+    found_request = FoundRequest(
+        pet_id=pet_id,
+        finder_id=current_user.id,
+        name=name,
+        address=address,
+        mobile=mobile,
+        description=description,
+        image=safe_filename,
+        status="pending",
+        date_reported=datetime.utcnow()
+    )
+
+    db.session.add(found_request)
+    db.session.commit()
+
+    flash("Your found pet request has been submitted successfully!", "success")
+    return redirect(url_for('report_lost'))
+
 @app.route('/found_pets')
 @login_required
 def found_pets():
     pets = FoundPet.query.filter_by(status='approved').all()
     return render_template('found_pet.html', user=current_user, pets=pets)
+
+@app.route('/admin/lost_found')
+@login_required
+def admin_lost_found():
+    found_requests = FoundRequest.query.order_by(FoundRequest.id.desc()).all()
+    return render_template('admin_lost_found.html', found_requests=found_requests)
+
+
+@app.route('/admin/approve_found_request/<int:request_id>', methods=['POST'])
+def approve_found_request(request_id):
+    req = FoundRequest.query.get_or_404(request_id)
+    req.status = 'Approved'
+
+    pet = LostPet.query.filter_by(id=req.pet_id).first()
+    if pet:
+        pet.pet_status = 'Founded'
+        pet.founded_at = datetime.utcnow()   # Update pet status to 'founded'
+
+    db.session.commit()
+    flash('Found request approved!', 'success')
+    return redirect(url_for('admin_lost_found'))
+
+@app.route('/admin/reject_found_request/<int:request_id>', methods=['POST'])
+def reject_found_request(request_id):
+    req = FoundRequest.query.get_or_404(request_id)
+    req.status = 'Rejected'
+    db.session.commit()
+    flash('Found request rejected.', 'info')
+    return redirect(url_for('admin_lost_found'))
+
+@app.route('/admin/delete_found_request/<int:request_id>', methods=['POST'])
+def delete_found_request(request_id):
+    req = FoundRequest.query.get_or_404(request_id)
+    db.session.delete(req)
+    db.session.commit()
+    flash('Found request deleted.', 'danger')
+    return redirect(url_for('admin_lost_found'))
 
 @app.route('/adopt_pets')
 @login_required
@@ -1084,3 +1176,19 @@ def move_found_pets_to_adopt():
 # Start background thread
 thread = threading.Thread(target=move_found_pets_to_adopt, daemon=True)
 thread.start()
+
+# ----------- Scheduled Task: Remove Founded Pets After 24 Hours -----------
+def remove_founded_pets():
+    with app.app_context():
+        one_day_ago = datetime.utcnow() - timedelta(days=1)
+        old_founded_pets = LostPet.query.filter(LostPet.pet_status=='Founded', LostPet.founded_at <= one_day_ago).all()
+
+        for pet in old_founded_pets:
+            db.session.delete(pet)
+        db.session.commit()
+
+        if old_founded_pets:
+            print(f"✅ Removed {len(old_founded_pets)} founded pets from records.")
+
+schedular.add_job(id='RemoveFoundedPets', func=remove_founded_pets, trigger='interval', hours=1)
+schedular.start()

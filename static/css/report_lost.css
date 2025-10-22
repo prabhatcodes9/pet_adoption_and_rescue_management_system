@@ -83,7 +83,17 @@ body {
     color: white;
 }
 
+.btn-secondary {
+    background-color: #2b7a78;
+    color: white;
+}
+
 .btn-primary:hover {
+    background-color: #1a5f5e;
+    transform: translateY(-1px);
+}
+
+.btn-secondary:hover {
     background-color: #1a5f5e;
     transform: translateY(-1px);
 }
@@ -623,3 +633,9 @@ body {
             background: red;
             color: #fff;
         }
+        .founded-status {
+    color: green;
+    font-weight: 500;
+    margin-top: 10px;
+    font-size: 1.3rem;
+}
