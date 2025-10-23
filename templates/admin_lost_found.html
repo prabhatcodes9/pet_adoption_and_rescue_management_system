@@ -22,10 +22,15 @@
             </div>
         </div>
     </header>
-
   <section class="container">
+    <!--Status Card-->
+    <div class="status-cards">
+      <div class="status-card active" onclick="showSection('found_section', this)">Found Your Pet</div>
+      <div class="status-card" onclick="showSection('claim_section', this)">That's My Pet</div>
+    </div>
+      <!--Lost request Page-->
+    <div id="found_section" class="fade show">
     <h2 class="section-title">Found Pet Reports</h2>
-
     {% if found_requests %}
     <div class="cards-grid">
       {% for req in found_requests %}
@@ -35,7 +40,7 @@
         </div>
 
         <div class="pet-details">
-          <h3>{{ req.pet.pet_name }}</h3>
+          <h3>{{ req.pet.pet_name }} ({{ req.pet.pet_type }})</h3>
           <p><strong>Finder Name:</strong> {{ req.name }}</p>
           <p><strong>Address:</strong> {{ req.address }}</p>
           <p><strong>Mobile:</strong> {{ req.mobile }}</p>
@@ -66,6 +71,64 @@
     {% else %}
     <p class="no-data">No pet requests yet.</p>
     {% endif %}
+  </div>
+  <!-- Claim Requests Section -->
+    <div id="claim_section" class="fade">
+    <h2 class="section-title">Claim Requests</h2>
+
+    {% if claim_requests %}
+    <div class="cards-grid">
+      {% for req in claim_requests %}
+      <div class="pet-card">
+        <div class="pet-image">
+          <img src="{{ url_for('static', filename='images/' + req.pet.image) }}" alt="Claimed Pet">
+        </div>
+
+        <div class="pet-details">
+          <h3>{{ req.pet.pet_name }} ({{ req.pet.pet_type }})</h3>
+          <hr>
+          <p><strong>Claimed By:</strong> {{ req.user.name }} ({{ req.user.email }})</p>
+          <p><strong>Mobile:</strong> {{ req.user.mobile }}</p>
+          <p><strong>Address:</strong> {{ req.user.address }}</p>
+          <p><strong>Proof of Identity:</strong> {{ req.description }}</p>
+          <p><strong>Date Requested:</strong> {{ req.date_reported.strftime('%d %B %Y') }}</p>
+          <p><strong>Status:</strong> <span class="status {{ req.status }}">{{ req.status }}</span></p>
+        </div>
+
+        <div class="pet-actions">
+          {% if req.status == 'pending' %}
+            <form action="{{ url_for('approve_claim_request', request_id=req.id) }}" method="POST" class="action-form">
+              <button type="submit" class="btn approve-btn">Approve</button>
+            </form>
+            <form action="{{ url_for('reject_claim_request', request_id=req.id) }}" method="POST" class="action-form">
+              <button type="submit" class="btn reject-btn">Reject</button>
+            </form>
+          {% endif %}
+          <form action="{{ url_for('delete_claim_request', request_id=req.id) }}" method="POST" class="action-form">
+            <button type="submit" class="btn delete-btn">Delete</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="no-data">No claim requests yet.</p>
+    {% endif %}
+  </div>
   </section>
+  <script>
+function showSection(sectionId, card) {
+  // Toggle active class on status cards
+  document.querySelectorAll('.status-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+
+  // Show/hide sections with fade
+  document.querySelectorAll('.fade').forEach(sec => sec.classList.remove('show'));
+  document.getElementById(sectionId).classList.add('show');
+}
+
+// Default section
+document.addEventListener('DOMContentLoaded', () => showSection('found_section', document.querySelector('.status-card.active')));
+</script>
 </body>
 </html>

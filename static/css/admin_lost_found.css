@@ -285,3 +285,79 @@ body {
     background-color: #1a5f5e;
     transform: translateY(-1px);
 }
+/* ===============================
+   Status Cards (Found/Claimed)
+================================= */
+.status-cards {
+    display: flex;
+    gap: 20px;
+    margin: 30px 0;
+    justify-content: center;
+}
+
+.status-card {
+    flex: 1;
+    max-width: 200px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.status-card h3 {
+    font-size: 1rem;
+    color: #2b7a78;
+    margin-bottom: 8px;
+}
+
+.status-card span {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: block;
+    margin-top: 5px;
+}
+
+.status-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+.status-card.active {
+    background: #2b7a78;
+    color: #fff;
+}
+
+/* ===============================
+   Fade & Show for Sections
+================================= */
+.fade {
+    opacity: 0;
+    display: none;
+    transition: opacity 0.4s ease-in-out;
+}
+
+.fade.show {
+    display: block;
+    opacity: 1;
+}
+
+/* ===============================
+   Optional: Section Grid Adjustments
+================================= */
+.found-section, .claimed-section {
+    margin-top: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .status-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+    .status-card {
+        width: 80%;
+    }
+}

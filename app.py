@@ -76,6 +76,8 @@ class FoundPet(db.Model):
     gender = db.Column(db.String(10))
     image = db.Column(db.String(255))
     status = db.Column(db.String(20), default="pending")
+    pet_status = db.Column(db.String(20), default="found")
+    founded_at = db.Column(db.DateTime, nullable=True)
 
     user = db.relationship('User', backref='found_pets')
 
@@ -118,6 +120,21 @@ class FoundRequest(db.Model):
     date_reported = db.Column(db.DateTime, default=datetime.utcnow)
 
     pet = db.relationship('LostPet', backref='found_requests')
+
+class ClaimRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    pet_id = db.Column(db.Integer, db.ForeignKey('found_pet.id'), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    address = db.Column(db.String(255), nullable=False)
+    mobile = db.Column(db.String(15), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    image = db.Column(db.String(255))
+    status = db.Column(db.String(20), default='pending')
+    date_reported = db.Column(db.DateTime, default=datetime.utcnow)
+
+    pet = db.relationship('FoundPet', backref='claim_requests')
+    user = db.relationship('User', backref='claim_requests')
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -793,7 +810,8 @@ def report_found():
             mobile=mobile,
             gender=gender,
             image=filename,
-            status="pending"
+            status="pending",
+            pet_status="found"
         )
         db.session.add(new_pet)
         db.session.commit()
@@ -845,6 +863,42 @@ def submit_found_request(pet_id):
     flash("Your found pet request has been submitted successfully!", "success")
     return redirect(url_for('report_lost'))
 
+@app.route('/submit_claim_request/<int:pet_id>', methods=['POST'])
+@login_required
+def submit_claim_request(pet_id):
+    name = request.form.get('name')
+    address = request.form.get('address')
+    mobile = request.form.get('mobile')
+    description = request.form.get('description')
+    image_file = request.files.get('image')
+
+    # Handle file upload
+    if image_file and image_file.filename != "":
+        safe_filename = secure_filename(image_file.filename)
+        image_path = os.path.join('static/images', safe_filename)
+        image_file.save(image_path)
+    else:
+        safe_filename = None
+
+    # Create new claim request
+    claim_request = ClaimRequest(
+        pet_id=pet_id,
+        owner_id=current_user.id,
+        name=name,
+        address=address,
+        mobile=mobile,
+        description=description,
+        image=safe_filename,
+        status="pending",
+        date_reported=datetime.utcnow()
+    )
+
+    db.session.add(claim_request)
+    db.session.commit()
+
+    flash("Your claim request has been submitted successfully!", "success")
+    return redirect(url_for('report_found'))
+
 @app.route('/found_pets')
 @login_required
 def found_pets():
@@ -855,7 +909,8 @@ def found_pets():
 @login_required
 def admin_lost_found():
     found_requests = FoundRequest.query.order_by(FoundRequest.id.desc()).all()
-    return render_template('admin_lost_found.html', found_requests=found_requests)
+    claim_requests = ClaimRequest.query.order_by(ClaimRequest.id.desc()).all()
+    return render_template('admin_lost_found.html', found_requests=found_requests, claim_requests=claim_requests)
 
 
 @app.route('/admin/approve_found_request/<int:request_id>', methods=['POST'])
@@ -886,6 +941,38 @@ def delete_found_request(request_id):
     db.session.delete(req)
     db.session.commit()
     flash('Found request deleted.', 'danger')
+    return redirect(url_for('admin_lost_found'))
+
+@app.route('/admin/approve_claim_request/<int:request_id>', methods=['POST'])
+def approve_claim_request(request_id):
+    req = ClaimRequest.query.get_or_404(request_id)
+    req.status = 'Approved'
+
+    pet = FoundPet.query.filter_by(id=req.pet_id).first()
+    if pet:
+        pet.pet_status = 'Claimed'
+        pet.founded_at = datetime.utcnow()
+
+    db.session.commit()
+    flash('Claim request approved!', 'success')
+    return redirect(url_for('admin_lost_found'))
+
+
+@app.route('/admin/reject_claim_request/<int:request_id>', methods=['POST'])
+def reject_claim_request(request_id):
+    req = ClaimRequest.query.get_or_404(request_id)
+    req.status = 'Rejected'
+    db.session.commit()
+    flash('Claim request rejected.', 'info')
+    return redirect(url_for('admin_lost_found'))
+
+
+@app.route('/admin/delete_claim_request/<int:request_id>', methods=['POST'])
+def delete_claim_request(request_id):
+    req = ClaimRequest.query.get_or_404(request_id)
+    db.session.delete(req)
+    db.session.commit()
+    flash('Claim request deleted.', 'danger')
     return redirect(url_for('admin_lost_found'))
 
 @app.route('/adopt_pets')
@@ -1145,7 +1232,7 @@ def move_found_pets_to_adopt():
             now = datetime.utcnow()
             threshold = now - timedelta(hours=5)
 
-            old_pets = FoundPet.query.filter(FoundPet.date_reported < threshold, FoundPet.status=='approved').all()
+            old_pets = FoundPet.query.filter(FoundPet.date_reported < threshold, FoundPet.status=='approved', FoundPet.pet_status=='found').all()
 
             for pet in old_pets:
                 # Move details to AdoptPet

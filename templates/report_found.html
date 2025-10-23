@@ -92,6 +92,44 @@
     </div>
   </div>
 
+  <!-- That's My Pet Modal -->
+  <div id="thatsMyPetModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🐶 Claim Your Pet</h2>
+        <span class="close" id="closeClaimModal">&times;</span>
+      </div>
+
+      <form id="claimForm" class="modal-form" method="POST" enctype="multipart/form-data">
+        <input type="hidden" id="claim_pet_id" name="pet_id">
+
+        <div class="form-group">
+          <label for="owner_name">Name</label>
+          <input type="text" id="owner_name" name="name" placeholder="Enter your name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="owner_mobile">Mobile</label>
+          <input type="tel" id="owner_mobile" name="mobile" placeholder="Enter your mobile number" required>
+        </div>
+
+        <div class="form-group">
+          <label for="proof_description">Proof / Description</label>
+          <textarea id="proof_description" name="description" placeholder="Describe how you can identify this pet (color, marks, etc.)" rows="4" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="owner_image">Upload Proof (optional)</label>
+          <input type="file" id="owner_image" name="image" accept="images/*">
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary btn-full">Submit Claim</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
     <!-- Found Pets List -->
      <section class="found-pets-section">
         <div class="container">
@@ -115,6 +153,12 @@
                 <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%d %B %Y') if pet.date_found else 'N/A' }}</p>
                 <p><strong>Found Location:</strong> {{ pet.found_location }}</p>
                 <p><strong>Contact:</strong> {{ pet.mobile }}</p>
+
+                {% if pet.pet_status == 'Claimed' %}
+                  <p class="founded-status"><strong>🐾 Returned to Owner</strong></p>
+                {% elif current_user.id != pet.user_id %}
+                  <button class="btn btn-secondary claim-pet-btn" data-pet-id="{{ pet.id }}">That’s My Pet</button>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
@@ -124,22 +168,40 @@
 </div>
         </div>
     </section>
-      <script>
+    <!-- Scripts -->
+  <script>
+    // Report Found Modal
     const modal = document.getElementById("foundModal");
     const openBtn = document.getElementById("openModalBtn");
     const closeBtn = document.getElementById("closeModal");
 
-    openBtn.addEventListener("click", () => {
-      modal.style.display = "block";
+    openBtn.addEventListener("click", () => modal.style.display = "block");
+    closeBtn.addEventListener("click", () => modal.style.display = "none");
+    window.addEventListener("click", (e) => { if (e.target === modal) modal.style.display = "none"; });
+
+    // That's My Pet Modal
+    const claimModal = document.getElementById("thatsMyPetModal");
+    const closeClaimModal = document.getElementById("closeClaimModal");
+    const claimBtns = document.querySelectorAll(".claim-pet-btn");
+    const claimForm = document.getElementById("claimForm");
+    const claimPetIdInput = document.getElementById("claim_pet_id");
+
+    claimBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const petId = btn.getAttribute("data-pet-id");
+        claimPetIdInput.value = petId;
+        claimForm.action = `/submit_claim_request/${petId}`; // Flask route
+        claimModal.style.display = "block";
+      });
     });
 
-    closeBtn.addEventListener("click", () => {
-      modal.style.display = "none";
+    closeClaimModal.addEventListener("click", () => {
+      claimModal.style.display = "none";
     });
 
     window.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        modal.style.display = "none";
+      if (e.target === claimModal) {
+        claimModal.style.display = "none";
       }
     });
   </script>
