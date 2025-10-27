@@ -17,6 +17,7 @@
                     <h1 class="logo-text">Welcome {{ user.name }} !</h1>
                 </div>
                 <nav class="header-nav">
+                  <a href="{{ url_for('admin_chat_rooms') }}" class="btn btn-primary">Chat Room</a>
                 <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
                 </nav>
             </div>

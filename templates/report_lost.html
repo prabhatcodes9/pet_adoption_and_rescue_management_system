@@ -172,27 +172,45 @@
     {% endif %}
 </div>
         </div>
+        {% if chat_room and chat_room.active %}
+  <button id="openChatBtn" class="chat-float-btn">
+    💬
+  </button>
+{% endif %}
+<div id="chatPopup" class="chat-popup">
+  <div class="chat-header">
+    <span>🐾 Pet Chat Room</span>
+    <button id="closeChatBtn">&times;</button>
+  </div>
+  <div id="chatMessages" class="chat-messages"></div>
+  <div class="chat-input">
+    <input type="text" id="chatInput" placeholder="Type a message..." />
+    <button id="sendMsgBtn">Send</button>
+  </div>
+</div>
     </section>
-      <script>
-    const modal = document.getElementById("reportModal");
-    const openBtn = document.getElementById("openModalBtn");
-    const closeBtn = document.getElementById("closeModal");
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  /* ==========================
+     Report Lost Modal
+  =========================== */
+  const reportModal = document.getElementById("reportModal");
+  const openModalBtn = document.getElementById("openModalBtn");
+  const closeModalBtn = document.getElementById("closeModal");
 
-    openBtn.addEventListener("click", () => {
-      modal.style.display = "block";
-    });
+  if (openModalBtn && reportModal) {
+    openModalBtn.addEventListener("click", () => reportModal.style.display = "block");
+  }
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener("click", () => reportModal.style.display = "none");
+  }
+  window.addEventListener("click", (e) => {
+    if (e.target === reportModal) reportModal.style.display = "none";
+  });
 
-    closeBtn.addEventListener("click", () => {
-      modal.style.display = "none";
-    });
-
-    window.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        modal.style.display = "none";
-      }
-    });
-    // Existing modal scripts remain above
-
+  /* ==========================
+     Found Pet Modal
+  =========================== */
   const foundModal = document.getElementById("foundModal");
   const closeFoundModal = document.getElementById("closeFoundModal");
   const foundBtns = document.querySelectorAll(".report-found-btn");
@@ -203,20 +221,83 @@
     btn.addEventListener("click", () => {
       const petId = btn.getAttribute("data-pet-id");
       foundPetIdInput.value = petId;
-      foundForm.action = `/submit_found_request/${petId}`; // route in Flask
+      foundForm.action = `/submit_found_request/${petId}`;
       foundModal.style.display = "block";
     });
   });
 
-  closeFoundModal.addEventListener("click", () => {
-    foundModal.style.display = "none";
+  if (closeFoundModal) {
+    closeFoundModal.addEventListener("click", () => foundModal.style.display = "none");
+  }
+  window.addEventListener("click", (e) => {
+    if (e.target === foundModal) foundModal.style.display = "none";
   });
 
-  window.addEventListener("click", (e) => {
-    if (e.target === foundModal) {
-      foundModal.style.display = "none";
-    }
-  });
-  </script>
+  /* ==========================
+     Chat Popup
+  =========================== */
+  const roomId = {{ chat_room.id if chat_room else 'null' }};
+  const chatBtn = document.getElementById('openChatBtn');
+  const chatPopup = document.getElementById('chatPopup');
+  const chatCloseBtn = document.getElementById('closeChatBtn');
+  const chatBox = document.getElementById('chatMessages');
+  const chatInput = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendMsgBtn');
+
+  function loadMessages() {
+    if (!roomId) return;
+    fetch(`/chat/${roomId}`)
+      .then(res => res.json())
+      .then(data => {
+        chatBox.innerHTML = '';
+        data.forEach(msg => {
+          const div = document.createElement('div');
+          div.classList.add('chat-message');
+          div.classList.add(msg.sender_id === {{ current_user.id }} ? 'self' : 'other');
+          div.innerHTML = `<strong>${msg.sender_id === {{ current_user.id }} ? 'You' : 'User ' + msg.sender_id}</strong><br>${msg.message}`;
+          chatBox.appendChild(div);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+  }
+
+  function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text || !roomId) return;
+    fetch(`/chat/send/${roomId}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: text})
+    })
+    .then(res => res.json())
+    .then(() => {
+      chatInput.value = '';
+      loadMessages();
+    });
+  }
+
+  if (chatBtn) {
+    chatBtn.onclick = () => {
+      chatPopup.style.display = 'flex';
+      loadMessages();
+    };
+  }
+
+  if (chatCloseBtn) {
+    chatCloseBtn.onclick = () => chatPopup.style.display = 'none';
+  }
+
+  if (sendBtn) {
+    sendBtn.onclick = sendMessage;
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+  }
+
+  setInterval(() => {
+    if (chatPopup.style.display === 'flex') loadMessages();
+  }, 5000);
+});
+</script>
   </body>
 </html>

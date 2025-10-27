@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Chat Room Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_chat_rooms.css') }}">
+</head>
+<body>
+  <header class="header">
+    <h1>Admin Chat Room Dashboard</h1>
+    <nav class="header-nav">
+        <a href="{{ url_for('admin_home') }}" class="btn btn-primary">← Back</a>
+    </nav>
+  </header>
+
+  <section class="chat-room-section">
+    <div class="container">
+      <h2>Active Chat Rooms</h2>
+      {% if rooms %}
+      <table class="chat-table">
+        <thead>
+          <tr>
+            <th>Pet Name</th>
+            <th>Type</th>
+            <th>User 1</th>
+            <th>User 2</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for data in rooms %}
+          <tr>
+            <td>{{ data.pet.pet_name }}</td>
+            <td>{{ data.pet.pet_type }}</td>
+            <td>{{ data.user1.name }}</td>
+            <td>{{ data.user2.name }}</td>
+            <td>
+              <button class="btn view-btn" data-pet='{{ data.pet | tojson }}'>View Pet</button>
+              <button class="btn chat-btn" data-room-id="{{ data.room.id }}">Open Chat</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No active chat rooms right now.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- Pet Details Modal -->
+  <div id="petModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Pet Details</h2>
+      <div id="petDetails"></div>
+    </div>
+  </div>
+
+  <!-- Chat Modal -->
+  <div id="chatModal" class="modal">
+    <div class="modal-content chat-content">
+      <div class="chat-header">
+        <h2>Chat Room</h2>
+        <span class="close">&times;</span>
+      </div>
+      <div id="chatMessages" class="chat-messages"></div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Type message...">
+        <button id="sendMsgBtn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const petModal = document.getElementById('petModal');
+    const petDetails = document.getElementById('petDetails');
+    const chatModal = document.getElementById('chatModal');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const sendMsgBtn = document.getElementById('sendMsgBtn');
+    let currentRoomId = null;
+
+    // PET DETAILS
+    document.querySelectorAll('.view-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pet = JSON.parse(btn.dataset.pet);
+        petDetails.innerHTML = `
+          <p><strong>Name:</strong> ${pet.pet_name}</p>
+          <p><strong>Type:</strong> ${pet.pet_type}</p>
+          <p><strong>Breed:</strong> ${pet.breed}</p>
+          <p><strong>Gender:</strong> ${pet.gender}</p>
+          <p><strong>Description:</strong> ${pet.description}</p>
+          <p><strong>Last Seen:</strong> ${pet.last_seen_location}</p>
+          <img src="/static/uploads/${pet.image}" alt="${pet.pet_name}" class="pet-img">
+        `;
+        petModal.style.display = 'flex';
+      });
+    });
+
+    // CHAT MODAL
+    document.querySelectorAll('.chat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentRoomId = btn.dataset.roomId;
+        loadChatMessages();
+        chatModal.style.display = 'flex';
+      });
+    });
+
+    // CLOSE MODALS
+    document.querySelectorAll('.close').forEach(btn => {
+      btn.addEventListener('click', () => {
+        petModal.style.display = 'none';
+        chatModal.style.display = 'none';
+      });
+    });
+
+    window.onclick = (e) => {
+      if (e.target === petModal) petModal.style.display = 'none';
+      if (e.target === chatModal) chatModal.style.display = 'none';
+    };
+
+    // LOAD CHAT MESSAGES
+    function loadChatMessages() {
+      if (!currentRoomId) return;
+      fetch(`/chat/${currentRoomId}`)
+        .then(res => res.json())
+        .then(data => {
+          chatMessages.innerHTML = '';
+          data.forEach(msg => {
+            const div = document.createElement('div');
+            div.classList.add('chat-msg', msg.sender_id === {{ current_user.id }} ? 'self' : 'other');
+            div.innerHTML = `<strong>${msg.sender_id === {{ current_user.id }} ? 'Admin' : 'User ' + msg.sender_id}</strong><br>${msg.message}`;
+            chatMessages.appendChild(div);
+          });
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+    }
+
+    // SEND MESSAGE
+    sendMsgBtn.addEventListener('click', () => {
+      const text = chatInput.value.trim();
+      if (!text || !currentRoomId) return;
+      fetch(`/chat/send/${currentRoomId}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: text})
+      }).then(() => {
+        chatInput.value = '';
+        loadChatMessages();
+      });
+    });
+
+    setInterval(() => {
+      if (chatModal.style.display === 'flex') loadChatMessages();
+    }, 4000);
+  });
+  </script>
+</body>
+</html>

@@ -61,6 +61,20 @@
               <button type="submit" class="btn reject-btn">Reject</button>
             </form>
           {% endif %}
+          {% if req.pet.pet_status == 'lost' %}
+            {% set chat_room = ChatRoom.query.filter_by(found_request_id=req.id).first() %}
+            {% if chat_room and chat_room.active %}
+              <form action="{{ url_for('disable_chat', found_request_id=req.id) }}" method="POST" style="display:inline;">
+                <button class="btn btn-warning btn-sm">Disable Chat</button>
+              </form>
+            {% else %}
+              <form action="{{ url_for('enable_chat', found_request_id=req.id) }}" method="POST" style="display:inline;">
+                <button class="btn btn-success btn-sm">Enable Chat</button>
+              </form>
+            {% endif %}
+          {% else %}
+            <button class="btn btn-secondary btn-sm" disabled>Chat Locked</button>
+          {% endif %}
           <form action="{{ url_for('delete_found_request', request_id=req.id) }}" method="POST" class="action-form">
             <button type="submit" class="btn delete-btn">Delete</button>
           </form>

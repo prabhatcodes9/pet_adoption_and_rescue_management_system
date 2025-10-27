@@ -148,6 +148,23 @@ class Notification(db.Model):
     def is_expired(self):
         """Check if the notification is older than 10 minutes."""
         return datetime.utcnow() > self.timestamp + timedelta(minutes=10)
+    
+class ChatRoom(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    pet_id = db.Column(db.Integer, db.ForeignKey('lost_pet.id'), nullable=False)
+    user1_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #Pet owner
+    user2_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #Finder
+    found_request_id = db.Column(db.Integer, db.ForeignKey('found_request.id'))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    active = db.Column(db.Boolean, default=False)
+
+
+class ChatMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.Integer, db.ForeignKey('chat_room.id'), nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 @app.route('/admin/approve_pet/<int:pet_id>', methods=['POST'])
 @login_required
@@ -723,7 +740,11 @@ def report_lost():
         return redirect(url_for('report_lost'))
     
     lost_pets = LostPet.query.filter_by(status='approved').order_by(LostPet.id.desc()).all()
-    return render_template('report_lost.html', user=current_user, lost_pets=lost_pets)
+    chat_room = ChatRoom.query.filter(
+        ((ChatRoom.user1_id == current_user.id) | (ChatRoom.user2_id == current_user.id)) &
+        (ChatRoom.active == True)
+    ).first()
+    return render_template('report_lost.html', user=current_user, lost_pets=lost_pets, chat_room=chat_room)
 
 @app.route('/report_adopt', methods=['GET', 'POST'])
 @login_required
@@ -910,7 +931,11 @@ def found_pets():
 def admin_lost_found():
     found_requests = FoundRequest.query.order_by(FoundRequest.id.desc()).all()
     claim_requests = ClaimRequest.query.order_by(ClaimRequest.id.desc()).all()
-    return render_template('admin_lost_found.html', found_requests=found_requests, claim_requests=claim_requests)
+
+    for req in found_requests:
+        req.chat_room = ChatRoom.query.filter_by(found_request_id=req.id).first()
+
+    return render_template('admin_lost_found.html', found_requests=found_requests, claim_requests=claim_requests, ChatRoom=ChatRoom)
 
 
 @app.route('/admin/approve_found_request/<int:request_id>', methods=['POST'])
@@ -1207,6 +1232,129 @@ def update_profile():
 
     flash("Profile updated successfully!", "success")
     return redirect(url_for('profile'))
+
+# ----------- Chat System -----------
+
+@app.route('/admin/enable_chat/<int:found_request_id>', methods=['POST'])
+@login_required
+def enable_chat(found_request_id):
+    if current_user.role != "admin":
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('admin_lost_found'))
+
+    found_req = FoundRequest.query.get_or_404(found_request_id)
+    pet = LostPet.query.get(found_req.pet_id)
+
+    # ✅ Allow enabling only if pet_status = 'Lost'
+    if pet.pet_status != 'lost':
+        flash("Chat can only be enabled for lost pets.", "warning")
+        return redirect(url_for('admin_lost_found'))
+
+    # ✅ Create or activate chat room
+    chat_room = ChatRoom.query.filter_by(found_request_id=found_request_id).first()
+
+    if not chat_room:
+        chat_room = ChatRoom(
+            pet_id=pet.id,
+            user1_id=pet.user_id,  # Pet owner
+            user2_id=found_req.finder_id,  # Finder
+            found_request_id=found_request_id,
+            active=True
+        )
+        db.session.add(chat_room)
+    else:
+        chat_room.active = True  # Reactivate if previously disabled
+
+    db.session.commit()
+    flash("Chat system activated successfully!", "success")
+    return redirect(url_for('admin_lost_found'))
+
+@app.route('/admin/disable_chat/<int:found_request_id>', methods=['POST'])
+@login_required
+def disable_chat(found_request_id):
+    if not current_user.role == "admin":
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('admin_lost_found'))
+
+    chat_room = ChatRoom.query.filter_by(found_request_id=found_request_id).first()
+    if chat_room:
+        chat_room.active = False
+        db.session.commit()
+        flash("Chat system disabled.", "info")
+    else:
+        flash("No active chat found.", "warning")
+
+    return redirect(url_for('admin_lost_found'))
+
+@app.route('/chat/<int:room_id>')
+@login_required
+def get_chat_messages(room_id):
+    room = ChatRoom.query.get_or_404(room_id)
+    if not room.active:
+        return jsonify({'error': 'Chat is not active'}), 403
+
+    messages = ChatMessage.query.filter_by(room_id=room_id).order_by(ChatMessage.timestamp.asc()).all()
+    data = [
+        {
+            'sender_id': msg.sender_id,
+            'message': msg.message,
+            'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M')
+        } for msg in messages
+    ]
+    return jsonify(data)
+
+
+@app.route('/chat/send/<int:room_id>', methods=['POST'])
+@login_required
+def send_message(room_id):
+    room = ChatRoom.query.get_or_404(room_id)
+    if not room.active:
+        return jsonify({'error': 'Chat not active'}), 403
+
+    message = request.json.get('message')
+    if not message.strip():
+        return jsonify({'error': 'Empty message'}), 400
+
+    msg = ChatMessage(room_id=room.id, sender_id=current_user.id, message=message)
+    db.session.add(msg)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@app.route('/admin/chat_rooms')
+@login_required
+def admin_chat_rooms():
+    if current_user.role != "admin":
+        flash('Access denied.')
+        return redirect(url_for('user_dashboard'))
+
+    chat_rooms = ChatRoom.query.filter_by(active=True).all()
+    room_data = []
+
+    for room in chat_rooms:
+        pet = LostPet.query.get(room.pet_id)
+        user1 = User.query.get(room.user1_id)
+        user2 = User.query.get(room.user2_id)
+
+        # ✅ Convert pet model to a serializable dict
+        pet_data = {
+            'id': pet.id,
+            'pet_name': pet.pet_name,
+            'pet_type': pet.pet_type,
+            'breed': pet.breed,
+            'gender': pet.gender,
+            'description': pet.description,
+            'last_seen_location': pet.last_seen_location,
+            'image': pet.image
+        }
+
+        room_data.append({
+            'room': room,
+            'pet': pet_data,
+            'user1': user1,
+            'user2': user2
+        })
+
+    return render_template('admin_chat_rooms.html', rooms=room_data)
 
 # ----------- Admin User Creation -----------
 with app.app_context():
