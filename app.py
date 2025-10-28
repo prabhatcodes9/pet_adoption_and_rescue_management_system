@@ -80,10 +80,12 @@ class FoundPet(db.Model):
     founded_at = db.Column(db.DateTime, nullable=True)
 
     user = db.relationship('User', backref='found_pets')
+    adopt_pets = db.relationship('AdoptPet', backref='found_pet', lazy=True)
 
 class AdoptPet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    pet_id = db.Column(db.Integer, db.ForeignKey('found_pet.id', ondelete='SET NULL'), nullable=True)
     pet_name = db.Column(db.String(100), nullable=False)
     pet_type = db.Column(db.String(50), nullable=False)
     breed = db.Column(db.String(100))
@@ -241,7 +243,7 @@ def login():
         else:
             flash('Invalid credentials!')
 
-    return render_template('dashboard.html')
+    return render_template('index.html')
 
 @app.route('/logout')
 @login_required
@@ -357,6 +359,12 @@ def delete_pet(pet_id):
         return jsonify({"error": "Access denied"}), 403
 
     pet = LostPet.query.get_or_404(pet_id)
+
+    chat_rooms = ChatRoom.query.filter_by(pet_id=pet.id).all()
+    for room in chat_rooms:
+        ChatMessage.query.filter_by(room_id=room.id).delete()
+
+    ChatRoom.query.filter_by(pet_id=pet.id).delete()
 
     # Delete the image file too if it exists
     image_path = os.path.join('static/uploads', pet.image)
@@ -947,6 +955,11 @@ def approve_found_request(request_id):
     if pet:
         pet.pet_status = 'Founded'
         pet.founded_at = datetime.utcnow()   # Update pet status to 'founded'
+    else:
+        adopt_pet = AdoptPet.query.filter_by(id=req.pet_id).first()
+        if adopt_pet:
+            adopt_pet.status = 'founded'
+            adopt_pet.founded_at = datetime.utcnow()
 
     db.session.commit()
     flash('Found request approved!', 'success')
@@ -1358,54 +1371,86 @@ def admin_chat_rooms():
 
 # ----------- Admin User Creation -----------
 with app.app_context():
-    admin_email = "admin@petrescue.com"
-    admin = User.query.filter_by(email=admin_email).first()
-    if not admin:
-        hashed_password = bcrypt.generate_password_hash("admin123").decode('utf-8')
-        admin_user = User(
-            name="Administrator",
-            mobile="N/A",
-            email=admin_email,
-            address="Head Office",
-            password=hashed_password,
-            role="admin"
-        )
-        db.session.add(admin_user)
-        db.session.commit()
-        print("✅ Admin user created: admin@petrescue.com / admin123")
+    admins = [
+        {
+            "name": "Administrator-1",
+            "email": "admin1@petrescue.com",
+            "password": "admin123",
+            "mobile": "N/A",
+            "address": "Head Office"
+        },
+        {
+            "name": "Administrator-2",
+            "email": "admin2@petrescue.com",
+            "password": "admin1234",
+            "mobile": "N/A",
+            "address": "Main Branch"
+        }
+    ]
+
+    for admin in admins:
+        admin_user = User.query.filter_by(email=admin["email"]).first()
+        if not admin_user:
+            hashed_password = bcrypt.generate_password_hash(admin["password"]).decode('utf-8')
+            new_admin = User(
+                name=admin["name"],
+                mobile=admin["mobile"],
+                email=admin["email"],
+                address=admin["address"],
+                password=hashed_password,
+                role="admin"
+            )
+            db.session.add(new_admin)
+            db.session.commit()
+            print(f"✅ Admin user created: {admin['email']} / {admin['password']}")
+        else:
+            print(f"ℹ️ Admin already exists: {admin['email']}")
 
 def move_found_pets_to_adopt():
     while True:
         with app.app_context():
             now = datetime.utcnow()
-            threshold = now - timedelta(hours=5)
+            threshold = now - timedelta(days=5)
 
-            old_pets = FoundPet.query.filter(FoundPet.date_reported < threshold, FoundPet.status=='approved', FoundPet.pet_status=='found').all()
+            old_pets = FoundPet.query.filter(
+                FoundPet.date_reported < threshold,
+                FoundPet.status == 'approved',
+                FoundPet.pet_status == 'found'
+            ).all()
 
             for pet in old_pets:
-                # Move details to AdoptPet
-                adopt_pet = AdoptPet(
-                    user_id=pet.user_id,  # original reporter (restricted later)
-                    pet_name=pet.pet_name or "Unknown",
-                    pet_type=pet.pet_type,
-                    breed=pet.breed,
-                    description=pet.description,
-                    age="Unknown",  # default since not in FoundPet
-                    injury="No",   # default, can be updated by admin if needed
-                    mobile=pet.mobile,
-                    gender=pet.gender,
-                    location=pet.found_location,
-                    image=pet.image,
-                    status="pending"
-                )
+                    # 1️⃣ Create AdoptPet entry
+                    adopt_pet = AdoptPet(
+                        pet_id = pet.id,
+                        user_id=pet.user_id,
+                        pet_name=pet.pet_name or "Unknown",
+                        pet_type=pet.pet_type,
+                        breed=pet.breed,
+                        description=pet.description,
+                        age="Unknown",
+                        injury="No",
+                        mobile=pet.mobile,
+                        gender=pet.gender,
+                        location=pet.found_location,
+                        image=pet.image,
+                        status="pending"
+                    )
+                    db.session.add(adopt_pet)
+                    db.session.flush()  # ensures adopt_pet.id is available
 
-                db.session.add(adopt_pet)
-                db.session.delete(pet)  # remove from found pets
+                    # 2️⃣ Update ClaimRequests that referenced old FoundPet
+                    related_claims = ClaimRequest.query.filter_by(pet_id=pet.id).all()
+                    for claim in related_claims:
+                        db.session.delete(claim)
+
+                    # 3️⃣ Now it's safe to delete the old FoundPet
+                    db.session.delete(pet)
+                    db.session.commit()
 
             if old_pets:
                 db.session.commit()
 
-        time.sleep(60)  # run every 60 seconds
+        time.sleep(60)
 
 
 # Start background thread
