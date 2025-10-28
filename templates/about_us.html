@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | PetConnect</title>
+    <meta name="description" content="Connect with loving pets in need of homes. Find lost pets, report found animals, and discover your perfect pet companion through our adoption services.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/about_us.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🐾</span>
+                    <h1 class="logo-text">PetConnect</h1>
+                </div>
+                <a href="{{ url_for('home') }}" class="btn btn-primary">Back</a>
+            </div>
+        </div>
+    </header>
+    <section class="about-container">
+    <h2>About Us</h2>
+    <p>
+      Welcome to <span class="highlight">PetConnect</span> — your trusted online platform for connecting pets with loving families across the nation.
+    </p>
+    <p>
+      Our mission is to build a compassionate community where every pet finds a home. Whether you have <span class="highlight">lost your pet</span>, <span class="highlight">found someone else’s pet</span>, or wish to <span class="highlight">adopt an abandoned animal</span>, PetConnect is here to help.
+    </p>
+    <p>
+      🐶 <b>Lost a pet?</b> — Report it on our platform so nearby users can help locate your furry friend.<br>
+      🐕‍🦺 <b>Found a pet?</b> — Upload the pet’s details and help us reunite them with their owner.<br>
+      🐾 <b>Want to adopt?</b> — Explore the list of abandoned or rescued pets ready for adoption.
+    </p>
+    <p>
+      Every small action makes a big difference in saving lives and spreading kindness. Join <span class="highlight">PetConnect</span> and be a part of our mission to bring pets and people together with love and care.
+    </p>
+    </section>
+</body>
+</html>

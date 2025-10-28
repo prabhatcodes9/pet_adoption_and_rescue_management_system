@@ -71,6 +71,26 @@
                         <p>This playful orange kitten is full of energy and love. Mango will bring joy and laughter to your home.</p>
                     </div>
                 </div>
+
+                <div class="pet-card" data-testid="card-pet-5">
+                    <div class="pet-image">
+                        <div class="placeholder-image">🐎</div>
+                    </div>
+                    <div class="pet-info">
+                        <h3>Storm</h3>
+                        <p>This playful and speedy Horse is full of energy and love. Storm will bring joy and laughter to your home.</p>
+                    </div>
+                </div>
+
+                <div class="pet-card" data-testid="card-pet-6">
+                    <div class="pet-image">
+                        <div class="placeholder-image">🐄</div>
+                    </div>
+                    <div class="pet-info">
+                        <h3>Gauri</h3>
+                        <p>This playful and cute Cow is full of energy and love. Gauri will bring joy and laughter to your home.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -91,11 +111,6 @@
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" placeholder="Enter your password" required data-testid="input-password">
-                </div>
-                
-                <div class="form-group">
-                    <label for="adminCode">Admin Code (Optional)</label>
-                    <input type="password" id="adminCode" name="adminCode" placeholder="Enter admin code if applicable" data-testid="input-admin-code">
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-full" data-testid="button-submit-login">Login</button>
@@ -148,7 +163,28 @@
             </div>
         </div>
     </div>
+    <!-- 🌟 Footer -->
+<footer class="footer">
+    <div class="container footer-content">
+        <div class="footer-left">
+            <h3 class="footer-logo">🐾 PetConnect</h3>
+            <p class="footer-tagline">Connecting pets with loving families across the nation.</p>
+        </div>
 
+        <div class="footer-right">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="{{ url_for('about')}}">About Us</a></li>
+                <li><a href="mailto:petconnect.help@gmail.com">Email Us</a></li>
+                <li><a href="{{ url_for('adoption_guidline')}}">Adoption Guidelines</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>©️ 2025 PetConnect. All rights reserved.</p>
+    </div>
+</footer>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 </body>

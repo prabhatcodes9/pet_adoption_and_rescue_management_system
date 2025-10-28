@@ -209,6 +209,14 @@ def approve_pet(pet_id):
 def home():
     return render_template('index.html')
 
+@app.route('/about')
+def about():
+    return render_template('about_us.html')
+
+@app.route('/adoption_guidline')
+def adoption_guidline():
+    return render_template('adoption_guidline.html')
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))

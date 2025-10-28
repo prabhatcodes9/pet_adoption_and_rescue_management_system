@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adoption Guidlines | PetConnect</title>
+    <meta name="description" content="Connect with loving pets in need of homes. Find lost pets, report found animals, and discover your perfect pet companion through our adoption services.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adoption_guidline.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🐾</span>
+                    <h1 class="logo-text">PetConnect</h1>
+                </div>
+                <a href="{{ url_for('home') }}" class="btn btn-primary">Back</a>
+            </div>
+        </div>
+    </header>
+    <section class="guidelines-container">
+    <h2>Adoption Guidelines</h2>
+    <p>
+      At <span class="highlight">PetConnect</span>, we ensure that every adoption is handled with care, transparency, and proper legal verification.
+      The following guidelines explain how the adoption process works for rescued and found pets.
+    </p>
+
+    <ul>
+      <li>🐕‍🦺 If any pet is <span class="highlight">found by a user</span> and remains without an owner for <b>15 days</b>, the pet becomes eligible for <span class="highlight">adoption</span>.</li>
+      <li>🐾 Such pets are verified and listed by PetConnect as <b>ready for adoption</b>.</li>
+      <li>📞 When a user makes an adoption request, they receive a <span class="highlight">verification call</span> from PetConnect to confirm their details and intent.</li>
+      <li>📋 After the necessary <span class="highlight">legal procedures</span> and documentation, the pet is officially handed over to its new owner.</li>
+      <li>❤️ PetConnect ensures every pet is adopted into a safe, loving, and responsible home.</li>
+    </ul>
+
+    <p>
+      Thank you for choosing to adopt, not shop. Every adoption helps give an animal a second chance at happiness.
+    </p>
+  </section>
+</body>
+</html>
