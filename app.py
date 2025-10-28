@@ -1306,14 +1306,24 @@ def get_chat_messages(room_id):
     if not room.active:
         return jsonify({'error': 'Chat is not active'}), 403
 
-    messages = ChatMessage.query.filter_by(room_id=room_id).order_by(ChatMessage.timestamp.asc()).all()
+    messages = (
+        db.session.query(ChatMessage, User)
+        .join(User, ChatMessage.sender_id == User.id)
+        .filter(ChatMessage.room_id == room_id)
+        .order_by(ChatMessage.timestamp.asc())
+        .all()
+    )
+
     data = [
         {
-            'sender_id': msg.sender_id,
-            'message': msg.message,
-            'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M')
-        } for msg in messages
+            'sender_id': msg.ChatMessage.sender_id,
+            'sender_name': msg.User.name,  # ✅ Add sender name here
+            'message': msg.ChatMessage.message,
+            'timestamp': msg.ChatMessage.timestamp.strftime('%Y-%m-%d %H:%M')
+        }
+        for msg in messages
     ]
+
     return jsonify(data)
 
 
