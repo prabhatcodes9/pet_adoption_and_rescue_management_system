@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Statistics | PetConnect</title>
+    <meta name="description" content="Connect with loving pets in need of homes. Find lost pets, report found animals, and discover your perfect pet companion through our adoption services.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pet_statics.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🐾</span>
+                    <h1 class="logo-text">PetConnect</h1>
+                </div>
+                <a href="{{ url_for('admin_home') }}" class="btn btn-primary">Back</a>
+            </div>
+        </div>
+    </header>
+<div class="stats-container">
+  <h1 class="page-title">🐾 Pet Statistics Dashboard</h1>
+
+  <div class="chart-grid">
+    <!-- 🟦 Left: Bar Chart for Lost / Found / Adopted -->
+    <div class="chart-box">
+      <h2>Overall Pet Status</h2>
+      <canvas id="statusChart"></canvas>
+    </div>
+
+    <!-- 🟠 Right: Doughnut Chart + Pet Type Table -->
+    <div class="chart-box">
+      <h2>Pet Type Distribution</h2>
+      <canvas id="petTypeChart"></canvas>
+
+      <table class="pet-type-table">
+        <thead>
+          <tr>
+            <th>Pet Type</th>
+            <th>Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for type, count in pet_type_counts %}
+          <tr>
+            <td>{{ type }}</td>
+            <td>{{ count }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<script>
+    Chart.register(ChartDataLabels);
+  // 🟦 Overall Pet Status Bar Chart
+  const statusCtx = document.getElementById('statusChart').getContext('2d');
+  new Chart(statusCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Lost Pets', 'Found Pets', 'Adopted Pets'],
+      datasets: [{
+        label: 'Number of Pets',
+        data: [{{ total_lost }}, {{ total_found }}, {{ total_adopted }}],
+        backgroundColor: ['#FF6B6B', '#4CAF50', '#FFCC00'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true, ticks: { color: '#333' } },
+        x: { ticks: { color: '#333' } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              return ctx.dataset.label + ': ' + ctx.parsed.y;
+            }
+          }
+        },
+        datalabels: {
+          display: true,
+          color: '#000',
+          anchor: 'end',
+          align: 'top',
+          formatter: (val) => val
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+
+  // 🟠 Pet Type Distribution Doughnut Chart
+  const typeCtx = document.getElementById('petTypeChart').getContext('2d');
+  new Chart(typeCtx, {
+    type: 'doughnut',
+    data: {
+      labels: [{% for type, count in pet_type_counts %}'{{ type }}',{% endfor %}],
+      datasets: [{
+        data: [{% for type, count in pet_type_counts %}{{ count }},{% endfor %}],
+        backgroundColor: ['#4A90E2', '#50E3C2', '#F5A623', '#D0021B', '#7ED321', '#9B59B6', '#16A085']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+</script>
+
+<!-- Chart.js plugin for showing data labels -->
+
+</body>
+</html>

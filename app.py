@@ -1552,6 +1552,39 @@ def get_found_chat_messages(room_id):
 
     return jsonify(data)
 
+@app.route('/admin/pet_statistics')
+@login_required
+def pet_statistics():
+    if current_user.role != 'admin':
+        flash("Access denied.")
+        return redirect(url_for('login'))
+
+    # Fetch statistics
+    total_lost = LostPet.query.count()
+    total_found = FoundPet.query.count()
+    total_adopted = AdoptPet.query.count()
+
+    # Count pets by type (from Lost + Found + Adopted)
+    from sqlalchemy import func, union_all
+
+    lost_types = db.session.query(LostPet.pet_type.label("type"))
+    found_types = db.session.query(FoundPet.pet_type.label("type"))
+    adopted_types = db.session.query(AdoptPet.pet_type.label("type"))
+
+    all_pets = lost_types.union_all(found_types, adopted_types).subquery()
+
+    pet_type_counts = db.session.query(
+        all_pets.c.type, func.count(all_pets.c.type)
+    ).group_by(all_pets.c.type).all()
+
+    return render_template(
+        'pet_statics.html',
+        total_lost=total_lost,
+        total_found=total_found,
+        total_adopted=total_adopted,
+        pet_type_counts=pet_type_counts
+    )
+
 # ----------- Admin User Creation -----------
 with app.app_context():
     admins = [
@@ -1593,7 +1626,7 @@ def move_found_pets_to_adopt():
     while True:
         with app.app_context():
             now = datetime.utcnow()
-            threshold = now - timedelta(days=7)
+            threshold = now - timedelta(days=10)
 
             old_pets = FoundPet.query.filter(
                 FoundPet.date_reported < threshold,
