@@ -261,10 +261,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password, password):
             login_user(user)
             flash('Login Successfully!')
-            if user.role == 'admin':
-                return redirect(url_for('admin_home'))
-            else:
-                return redirect(url_for('user_dashboard'))
+            return redirect(url_for('user_dashboard'))
         else:
             flash('Invalid credentials!')
 
@@ -286,7 +283,7 @@ def profile():
 @app.route('/user/dashboard')
 @login_required
 def user_dashboard():
-    if current_user.role != "user":
+    if current_user.role not in ["user", "admin"]:
         flash("Access denied!", "danger")
         return redirect(url_for('login'))
 
@@ -312,7 +309,7 @@ def mark_notifications_read():
 def admin_home():
     if current_user.role != "admin":
         flash("Access denied!", "danger")
-        return redirect(url_for('login'))
+        return redirect(url_for('user_dashboard'))
 
     # --- Counts ---
     lost_count = LostPet.query.filter_by(status='approved').count()

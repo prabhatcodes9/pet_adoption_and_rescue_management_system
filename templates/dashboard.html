@@ -26,6 +26,9 @@
                     <span class="notif-count">{{ unread|length }}</span>
                     {% endif %}
                 </button>
+                {% if user.role == 'admin' %}
+                <a href="{{ url_for('admin_home') }}" class="btn btn-primary">Admin</a>
+                {% endif %}
                 <!-- ✅ Profile Button -->
                 <a href="{{ url_for('profile') }}" class="btn btn-secondary">Profile</a>
                 <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
