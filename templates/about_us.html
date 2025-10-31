@@ -18,7 +18,17 @@
                     <span class="logo-icon">🐾</span>
                     <h1 class="logo-text">PetConnect</h1>
                 </div>
-                <a href="{{ url_for('home') }}" class="btn btn-primary">Back</a>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'admin' %}
+                        <a href="{{ url_for('user_dashboard') }}" class="btn btn-primary">Back</a>
+                    {% elif current_user.role == 'user' %}
+                        <a href="{{ url_for('user_dashboard') }}" class="btn btn-primary">Back</a>
+                    {% else %}
+                        <a href="{{ url_for('home') }}" class="btn btn-primary">Back</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ url_for('home') }}" class="btn btn-primary">Back</a>
+                {% endif %}
             </div>
         </div>
     </header>
