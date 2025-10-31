@@ -10,6 +10,7 @@ import time
 from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
 from flask_apscheduler import APScheduler
+from sqlalchemy import func, union_all
 
 app = Flask(__name__)
 app.secret_key = 'my-secret-key'
@@ -320,6 +321,7 @@ def admin_home():
     total_pets = lost_count + found_count + adopt_count
 
     total_users = User.query.filter_by(role='user').count()  # only normal users
+    admin_users = User.query.filter_by(role='admin').count()
     pending_requests = AdoptRequest.query.filter_by(status='pending').count()
 
     return render_template(
@@ -330,6 +332,7 @@ def admin_home():
         adopt_count=adopt_count,
         total_pets=total_pets,
         total_users=total_users,
+        admin_users=admin_users,
         pending_requests=pending_requests
     )
 
@@ -1565,7 +1568,6 @@ def pet_statistics():
     total_adopted = AdoptPet.query.count()
 
     # Count pets by type (from Lost + Found + Adopted)
-    from sqlalchemy import func, union_all
 
     lost_types = db.session.query(LostPet.pet_type.label("type"))
     found_types = db.session.query(FoundPet.pet_type.label("type"))
@@ -1577,12 +1579,15 @@ def pet_statistics():
         all_pets.c.type, func.count(all_pets.c.type)
     ).group_by(all_pets.c.type).all()
 
+    total_pets = sum(count for _, count in pet_type_counts)
+
     return render_template(
         'pet_statics.html',
         total_lost=total_lost,
         total_found=total_found,
         total_adopted=total_adopted,
-        pet_type_counts=pet_type_counts
+        pet_type_counts=pet_type_counts,
+        total_pets=total_pets
     )
 
 # ----------- Admin User Creation -----------
