@@ -143,27 +143,42 @@
             </div>
 
             <div class="cards-grid">
-    {% if found_pets %}
-        {% for pet in found_pets %}
-        <div class="pet-card">
-            <div class="pet-image">
-                <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
-            </div>
-            <div class="pet-details">
-                <h3>{{ pet.pet_name }}</h3>
-                <p><strong>Type:</strong> {{ pet.pet_type }}</p>
-                <p><strong>Breed:</strong> {{ pet.breed }}</p>
-                <p><strong>Description:</strong> {{ pet.description }}</p>
-                <p><strong>Gender:</strong> {{ pet.gender }}</p>
-                <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%d %B %Y') if pet.date_found else 'N/A' }}</p>
-                <p><strong>Found Location:</strong> {{ pet.found_location }}</p>
-                <p><strong>Contact:</strong> {{ pet.mobile }}</p>
+              {% if found_pets %}
+                {% for pet in found_pets %}
+                <div class="pet-card">
+                  <div class="pet-image">
+                    <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
+                  </div>
+                  <h3>{{ pet.pet_name }}</h3>
+                  <div class="tags">
+                    <span class="tag">{{ pet.pet_type }}</span>
+                    <span class="tag">{{ pet.gender }}</span>
+                  </div>
 
-                {% if pet.pet_status == 'Claimed' %}
-                  <p class="founded-status"><strong>🐾 Returned to Owner</strong></p>
-                {% elif current_user.id != pet.user_id %}
-                  <button class="btn btn-secondary claim-pet-btn" data-pet-id="{{ pet.id }}">That’s My Pet</button>
-                {% endif %}
+                  <div class="details">
+                    <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%d %B %Y') if pet.date_found else 'N/A' }}</p>
+                    <p><strong>Found Location:</strong> {{ pet.found_location }}</p>
+                  </div>
+
+                  <button class="view-btn" onclick="openPetModal('{{ pet.id }}')">View Details</button>
+                  {% if pet.pet_status == 'Claimed' %}
+                    <p class="founded-status"><strong>🐾 Returned to Owner</strong></p>
+                  {% elif current_user.id != pet.user_id %}
+                    <button class="view-btn claim-pet-btn" data-pet-id="{{ pet.id }}">That’s My Pet</button>
+                  {% endif %}
+                </div>
+                <!-- Pet Details Modal -->
+                <div class="petmodal" id="petModal-{{ pet.id }}">
+                  <div class="pet-modal-content">
+                    <button class="close-btn" onclick="closePetModal('{{ pet.id }}')">&times;</button>
+                    <h2>{{ pet.pet_name }}</h2>
+                    <p><strong>Type:</strong> {{ pet.pet_type }}</p>
+                    <p><strong>Breed:</strong> {{ pet.breed }}</p>
+                    <p><strong>Description:</strong> {{ pet.description }}</p>
+                    <p><strong>Gender:</strong> {{ pet.gender }}</p>
+                    <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%d %B %Y') if pet.date_found else 'N/A' }}</p>
+                    <p><strong>Found Location:</strong> {{ pet.found_location }}</p>
+                    <p><strong>Contact:</strong> {{ pet.mobile }}</p>
             </div>
         </div>
         {% endfor %}
@@ -306,6 +321,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (chatPopup.style.display === 'flex') loadMessages();
   }, 5000);
 });
+function openPetModal(id) {
+  document.getElementById('petModal-' + id).style.display = 'flex';
+}
+function closePetModal(id) {
+  document.getElementById('petModal-' + id).style.display = 'none';
+}
+window.onclick = function(event) {
+  document.querySelectorAll('.modal').forEach(modal => {
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+}
 </script>
   </body>
 </html>
