@@ -104,7 +104,7 @@
      <section class="found-pets-section">
         <div class="container">
             <div class="section-header">
-                <h2>Recently Reported Pet for Adoption</h2>
+                <h2>Pets for Adoption</h2>
             </div>
 
             <div class="cards-grid">
@@ -114,8 +114,34 @@
                   <div class="pet-image">
                     <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
                   </div>
-                  <div class="pet-details">
+
                       <h3>{{ pet.pet_name }}</h3>
+                      <div class="tags">
+                        <span class="tag">{{ pet.pet_type }}</span>
+                        <span class="tag">{{ pet.breed }}</span>
+                        {% if pet.status == 'adopted' %}
+                        <span class="tag">Adopted</span>
+                        {% endif %}
+                      </div>
+
+                      <div class="details">
+                        <p><strong>Details:</strong> {{ pet.description }}</p>
+                        <p><strong>Location:</strong> {{ pet.location }}</p>
+                      </div>
+
+                      <button class="view-btn" onclick="openPetModal('{{ pet.id }}')">View Details</button>
+                      {% if pet.user_id != user.id and pet.status != 'adopted' %}
+                      <button class="view-btn openRequestModal" data-petid = "{{ pet.id }}" data-petname="{{ pet.pet_name }}">🤍 Adopt Me
+                      </button>
+                      {% elif pet.user_id == user.id %}
+                      <p style="color: gray; font-style: italic;">(You reported this pet)</p>
+                      {% endif %}
+              </div>
+              <!-- Pet Details Modal -->
+              <div class="petmodal" id="petModal-{{ pet.id }}">
+                  <div class="pet-modal-content">
+                    <button class="close-btn" onclick="closePetModal('{{ pet.id }}')">&times;</button>
+                    <h2>{{ pet.pet_name }}</h2>
                       <p><strong>Type:</strong> {{ pet.pet_type }}</p>
                       <p><strong>Breed:</strong> {{ pet.breed }}</p>
                       <p><strong>Age:</strong> {{ pet.age }}</p>
@@ -124,15 +150,6 @@
                       <p><strong>Gender:</strong> {{ pet.gender }}</p>
                       <p><strong>Location:</strong> {{ pet.location }}</p>
                       <p><strong>Contact:</strong> {{ pet.mobile }}</p>
-                      {% if pet.status == 'adopted' %}
-                      <p style="color: green; font-weight: bold;">Adopted</p>
-                      {% elif pet.user_id != user.id %}
-                      <button class="btn btn-primary openRequestModal" data-petid = "{{ pet.id }}" data-petname="{{ pet.pet_name }}">
-                        Request
-                      </button>
-                      {% else %}
-                      <p style="color: gray; font-style: italic;">(You reported this pet)</p>
-                      {% endif %}
                   </div>
               </div>
               {% endfor %}
@@ -219,6 +236,19 @@
         window.addEventListener("click", (e) => {
             if (e.target === requestModal) requestModal.style.display = "none";
         });
+        function openPetModal(id) {
+  document.getElementById('petModal-' + id).style.display = 'flex';
+}
+function closePetModal(id) {
+  document.getElementById('petModal-' + id).style.display = 'none';
+}
+window.onclick = function(event) {
+  document.querySelectorAll('.modal').forEach(modal => {
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+}
   </script>
   </body>
 </html>

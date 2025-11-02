@@ -6,8 +6,8 @@
     <title>PetConnect - Find Your Perfect Pet Companion</title>
     <meta name="description" content="Connect with loving pets in need of homes. Find lost pets, report found animals, and discover your perfect pet companion through our adoption services.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 </head>
 <body>
     <!-- Header -->
@@ -19,19 +19,26 @@
                     <h1 class="logo-text">Welcome {{ user.name }} !</h1>
                 </div>
                 <div class="header-actions">
-                <button id="notifBtn" class="notif-button">
-                    Messages
+                <button id="notifBtn" class="icon-btn" title="Messages">
+                    <i data-lucide="bell"></i>
                     {% set unread = notifications | selectattr('is_read', 'equalto', False) | list %}
                     {% if unread|length > 0 %}
                     <span class="notif-count">{{ unread|length }}</span>
                     {% endif %}
                 </button>
+                <span class="divider"> | </span>
                 {% if user.role == 'admin' %}
-                <a href="{{ url_for('admin_home') }}" class="btn btn-primary">Admin</a>
+                <a href="{{ url_for('admin_home') }}" class="icon-btn" title="Admin"><i data-lucide="shield"></i></a>
+                <span class="divider"> | </span>
                 {% endif %}
                 <!-- ✅ Profile Button -->
-                <a href="{{ url_for('profile') }}" class="btn btn-secondary">Profile</a>
-                <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
+                <a href="{{ url_for('profile') }}" class="icon-btn" title="Profile">
+                    <i data-lucide="user"></i>
+                </a>
+                <span class="divider"> | </span>
+                <a href="{{ url_for('logout') }}" class="icon-btn" title="Logout">
+                    <i data-lucide="log-out"></i>
+                </a>
                 </div>
         </div>
         </div>
@@ -131,6 +138,7 @@
     window.onclick = (event) => {
       if (event.target == notifPopup) notifPopup.style.display = "none";
     };
+    lucide.createIcons();
   </script>
   </body>
 </html>
