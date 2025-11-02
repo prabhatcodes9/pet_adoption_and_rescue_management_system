@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat with Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_chat.css') }}">
+</head>
+<body>
+  <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🐾</span>
+                    <h1 class="logo-text">Welcome {{ user.name }} !</h1>
+                </div>
+                <nav class="header-nav">
+                <a href="{{ url_for('user_dashboard') }}" class="btn btn-primary">Back</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <div class="chat-wrapper">
+        <!-- Sidebar for Users -->
+        <div class="user-list">
+            <h3>Users</h3>
+            <ul id="userList">
+                {% for usr in users %}
+                <li onclick="selectUser({{ usr.id }}, '{{ usr.name }}')">
+                    🐾 {{ usr.name }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <h3 id="chatWith">Select a user to start chatting</h3>
+            </div>
+            <div class="chat-box" id="chatBox"></div>
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Type your message..." disabled>
+                <button id="sendBtn" disabled>Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedUser = null;
+        const currentUserId = {{ user.id }};
+
+        function selectUser(userId, userName) {
+            selectedUser = userId;
+            document.getElementById("chatWith").innerText = `Chatting with ${userName}`;
+            document.getElementById("messageInput").disabled = false;
+            document.getElementById("sendBtn").disabled = false;
+            loadMessages();
+        }
+
+        function loadMessages() {
+            if (!selectedUser) return;
+
+            fetch(`/chat/messages/${selectedUser}`)
+                .then(res => res.json())
+                .then(messages => {
+                    const chatBox = document.getElementById("chatBox");
+                    chatBox.innerHTML = "";
+                    messages.forEach(msg => {
+                        const div = document.createElement("div");
+                        div.className = msg.sender === currentUserId ? "sent" : "received";
+                        div.textContent = msg.message;
+                        chatBox.appendChild(div);
+                    });
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                });
+        }
+
+        document.getElementById("sendBtn").onclick = () => {
+            const msg = document.getElementById("messageInput").value.trim();
+            if (!msg || !selectedUser) return;
+
+            fetch("/admin_user_chat/send", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: msg, admin_id: selectedUser }) // using same route, field renamed
+            }).then(() => {
+                document.getElementById("messageInput").value = "";
+                loadMessages();
+            });
+        };
+
+        setInterval(loadMessages, 3000);
+    </script>
+</body>
+</html>

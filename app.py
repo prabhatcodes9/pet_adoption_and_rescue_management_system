@@ -150,7 +150,7 @@ class Notification(db.Model):
 
     def is_expired(self):
         """Check if the notification is older than 10 minutes."""
-        return datetime.utcnow() > self.timestamp + timedelta(minutes=10)
+        return datetime.utcnow() > self.timestamp + timedelta(minutes=5)
     
 class ChatRoom(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -182,6 +182,13 @@ class FoundChatMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     room_id = db.Column(db.Integer, db.ForeignKey('found_chat_room.id'), nullable=False)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class AdminUserChatMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -1586,6 +1593,51 @@ def pet_statistics():
         pet_type_counts=pet_type_counts,
         total_pets=total_pets
     )
+
+@app.route('/chat/messages/<int:admin_id>')
+@login_required
+def get_messages(admin_id):
+    messages = AdminUserChatMessage.query.filter(
+        ((AdminUserChatMessage.sender_id == current_user.id) & (AdminUserChatMessage.receiver_id == admin_id)) |
+        ((AdminUserChatMessage.sender_id == admin_id) & (AdminUserChatMessage.receiver_id == current_user.id))
+    ).order_by(AdminUserChatMessage.timestamp).all()
+
+    return jsonify([
+        {
+            'sender': msg.sender_id,
+            'receiver': msg.receiver_id,
+            'message': msg.message,
+            'timestamp': msg.timestamp.strftime("%H:%M")
+        } for msg in messages
+    ])
+
+@app.route('/admin_user_chat/send', methods=['POST'])
+@login_required
+def send_user_message():
+    data = request.get_json()
+    receiver_id = data.get('receiver_id') or data.get('admin_id')  # support both names
+    message = data.get('message')
+
+    new_msg = AdminUserChatMessage(sender_id=current_user.id, receiver_id=receiver_id, message=message)
+    db.session.add(new_msg)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@app.route('/admin/chat')
+@login_required
+def admin_chat():
+    if current_user.role != "admin":
+        flash("Access denied", "danger")
+        return redirect(url_for("login"))
+
+    users = User.query.filter_by(role="user").all()
+    return render_template('admin_chat.html', users=users, user=current_user)
+
+@app.route('/user_chat')
+@login_required
+def user_chat():
+    admins = User.query.filter_by(role='admin').all()
+    return render_template('user_chat.html', admins=admins, user=current_user)
 
 # ----------- Admin User Creation -----------
 with app.app_context():

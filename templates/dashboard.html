@@ -36,6 +36,18 @@
                     <i data-lucide="user"></i>
                 </a>
                 <span class="divider"> | </span>
+                {% if user.role == 'admin' %}
+                <!-- 💬 Admin Chat Button -->
+                <a href="{{ url_for('admin_chat') }}" class="icon-btn" title="Chat Rooms">
+                    <i data-lucide="message-square"></i>
+                </a>
+                {% else %}
+                <a href="{{ url_for('user_chat') }}" class="icon-btn" title="Chat">
+                    <i data-lucide="message-circle"></i>
+                </a>
+                {% endif %}
+                <span class="divider"> | </span>
+                <!-- 🚪 Logout Button -->
                 <a href="{{ url_for('logout') }}" class="icon-btn" title="Logout">
                     <i data-lucide="log-out"></i>
                 </a>
