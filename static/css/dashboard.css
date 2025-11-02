@@ -725,11 +725,15 @@ body {
   cursor: pointer;
   position: relative;
   padding: 0 8px;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
 .icon-btn:hover {
-  transform: scale(1.1);
+  transform: translateY(-2px);
   color: #00796b;
 }
 
