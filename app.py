@@ -191,6 +191,7 @@ class AdminUserChatMessage(db.Model):
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
 
 @app.route('/admin/approve_pet/<int:pet_id>', methods=['POST'])
 @login_required
@@ -1639,6 +1640,36 @@ def user_chat():
     admins = User.query.filter_by(role='admin').all()
     return render_template('user_chat.html', admins=admins, user=current_user)
 
+@app.route('/chat/check_new')
+@login_required
+def check_new_messages():
+    from sqlalchemy import and_
+    unread_messages = AdminUserChatMessage.query.filter(
+        and_(
+            AdminUserChatMessage.receiver_id == current_user.id,
+            AdminUserChatMessage.is_read == False
+        )
+    ).all()
+
+    # Return list of sender IDs with unread messages
+    result = []
+    seen = set()
+    for msg in unread_messages:
+        if msg.sender_id not in seen:
+            result.append({'sender_id': msg.sender_id, 'unread': True})
+            seen.add(msg.sender_id)
+    return jsonify(result)
+
+@app.route('/chat/mark_read/<int:user_id>', methods=['POST'])
+@login_required
+def mark_chat_as_read(user_id):
+    AdminUserChatMessage.query.filter_by(
+        sender_id=user_id,
+        receiver_id=current_user.id,
+        is_read=False
+    ).update({'is_read': True})
+    db.session.commit()
+    return jsonify({'success': True})
 # ----------- Admin User Creation -----------
 with app.app_context():
     admins = [
