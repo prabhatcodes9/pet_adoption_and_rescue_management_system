@@ -224,6 +224,7 @@ body {
 .pink { border-left-color: #ff6fa1; }
 .teal { border-left-color: #56b6a3; }
 .yellow { border-left-color: #f6b23c; }
+.violet { border-left-color: #9b59b6; }
 
 /* Responsive */
 @media (max-width: 900px) {

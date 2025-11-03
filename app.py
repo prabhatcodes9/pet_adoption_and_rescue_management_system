@@ -386,6 +386,10 @@ def admin_home():
     admin_users = User.query.filter_by(role='admin').count()
     pending_requests = AdoptRequest.query.filter_by(status='pending').count()
 
+    lost_pending = LostPet.query.filter_by(status='pending').count()
+    found_pending = FoundPet.query.filter_by(status='pending').count()
+    lost_found_pending = lost_pending + found_pending
+
     return render_template(
         'admin_index.html',
         user=current_user,
@@ -395,7 +399,8 @@ def admin_home():
         total_pets=total_pets,
         total_users=total_users,
         admin_users=admin_users,
-        pending_requests=pending_requests
+        pending_requests=pending_requests,
+        lost_found_pending=lost_found_pending
     )
 
 @app.route('/admin/dashboard')

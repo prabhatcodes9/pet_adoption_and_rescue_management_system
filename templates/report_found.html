@@ -153,6 +153,11 @@
                   <div class="tags">
                     <span class="tag">{{ pet.pet_type }}</span>
                     <span class="tag">{{ pet.gender }}</span>
+                    {% if pet.pet_status == 'found' %}
+                      <span class="tag">Found<span>
+                    {% elif pet.pet_status == 'Claimed' %}
+                    <span class="tag">Reunited<span>
+                    {% endif %}
                   </div>
 
                   <div class="details">
@@ -161,9 +166,7 @@
                   </div>
 
                   <button class="view-btn" onclick="openPetModal('{{ pet.id }}')">View Details</button>
-                  {% if pet.pet_status == 'Claimed' %}
-                    <p class="founded-status"><strong>🐾 Returned to Owner</strong></p>
-                  {% elif current_user.id != pet.user_id %}
+                  {% if current_user.id != pet.user_id and pet.pet_status != 'Claimed' %}
                     <button class="view-btn claim-pet-btn" data-pet-id="{{ pet.id }}">That’s My Pet</button>
                   {% endif %}
                 </div>
