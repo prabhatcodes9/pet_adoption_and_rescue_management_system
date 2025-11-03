@@ -3,8 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from datetime import datetime, timedelta
-import os
-from flask import jsonify
+import os, random
+from flask import jsonify, session
 import threading
 import time
 from flask_mail import Mail, Message
@@ -243,6 +243,10 @@ def register():
         address = request.form.get('address') or 'N/A'
         password = bcrypt.generate_password_hash(request.form.get('password')).decode('utf-8')
 
+        if not session.get('email_verified') or session.get('otp_email') != email:
+            flash('Please verify your email with OTP before registering.', 'danger')
+            return redirect(url_for('home'))
+
         user = User(
             name=name,
             mobile=mobile,     
@@ -253,10 +257,63 @@ def register():
         db.session.add(user)
         db.session.commit()
 
+        session.pop('otp', None)
+        session.pop('otp_email', None)
+        session.pop('otp_time', None)
+        session.pop('email_verified', None)
+
         flash('Account created Successfully!')
         return redirect(url_for('home'))
     
     return redirect(url_for('home'))
+
+@app.route('/send_otp', methods=['POST'])
+def send_otp():
+    data = request.get_json()
+    email = data.get('email')
+
+    if not email:
+        return jsonify({"status": "error", "message": "Email is required."})
+
+    otp = str(random.randint(1000, 9999))
+    session['otp'] = otp
+    session['otp_email'] = email
+    session['otp_time'] = time.time()
+
+    try:
+        msg = Message('Your OTP for PetConnect Registration',
+                      sender=app.config['MAIL_USERNAME'],
+                      recipients=[email])
+        msg.body = f"Your OTP is {otp}. It is valid for 5 minutes."
+        mail.send(msg)
+        return jsonify({"status": "success", "message": "OTP sent to your email."})
+    except Exception as e:
+        print("Mail error:", e)
+        return jsonify({"status": "error", "message": "Error sending OTP. Check mail setup."})
+
+
+@app.route('/verify_otp', methods=['POST'])
+def verify_otp():
+    data = request.get_json()
+    email = data.get('email')
+    otp = data.get('otp')
+
+    stored_otp = session.get('otp')
+    stored_email = session.get('otp_email')
+    otp_time = session.get('otp_time')
+
+    if not stored_otp or not stored_email:
+        return jsonify({"status": "error", "message": "No OTP found. Please request again."})
+
+    if time.time() - otp_time > 300:  # 5 min expiry
+        session.pop('otp', None)
+        return jsonify({"status": "error", "message": "OTP expired. Please request a new one."})
+
+    if email == stored_email and otp == stored_otp:
+        session['email_verified'] = True
+        return jsonify({"status": "verified", "message": "OTP verified successfully!"})
+    else:
+        return jsonify({"status": "error", "message": "Invalid OTP."})
 
 
 @app.route('/login', methods=['GET', 'POST'])

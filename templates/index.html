@@ -149,7 +149,18 @@
                     <label for="email">Email Address</label>
                     <input type="email" id="email" name="email" placeholder="Enter your email address" required data-testid="input-email">
                 </div>
-                
+
+                <div id="otpSection" class="form-group" style="display:none;">
+                    <label for="otp">OTP</label>
+                    <input type="text" id="otp" name="otp" placeholder="Enter the OTP sent to your email">
+                    <button type="button" class="btn btn-secondary" id="verifyOtpBtn">Verify OTP</button>
+                    <small id="otpStatus" style="color: green;"></small>
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="btn btn-secondary" id="sendOtpBtn">Send OTP</button>
+                </div>  
+
                 <div class="form-group">
                     <label for="registerPassword">Password</label>
                     <input type="password" id="password" name="password" placeholder="Create a strong password" required data-testid="input-password-register">
