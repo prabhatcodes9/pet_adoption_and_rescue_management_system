@@ -1,162 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lost Pets - Admin</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_lost.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Found Pets - Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_lost.css') }}">
 </head>
 <body>
 <div class="container">
-    <header class="dashboard-header">
-        <div>
-            <h1>Found Pets Management</h1>
-            <p>View and manage all found pet reports</p>
-        </div>
-        <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Back to Dashboard</a>
-    </header>
-
-    <!-- Status Cards -->
-    <div class="status-cards">
-        <div class="status-card" onclick="showSection('pending')">
-            <h3>Pending</h3>
-            <span>{{ pending_count }}</span>
-        </div>
-        <div class="status-card" onclick="showSection('approved')">
-            <h3>Approved</h3>
-            <span>{{ approved_count }}</span>
-        </div>
-        <div class="status-card" onclick="showSection('rejected')">
-            <h3>Rejected</h3>
-            <span>{{ rejected_count }}</span>
-        </div>
+  <header class="dashboard-header">
+    <div>
+      <h1>Found Pets Management</h1>
+      <p>View and manage all found pet reports</p>
     </div>
+    <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Back to Dashboard</a>
+  </header>
 
-    <div class="pet-sections-container">
-        <!-- Pending Section -->
-        <div id="pending" class="pet-grid fade show">
-            {% if pending_pets %}
-                {% for pet in pending_pets %}
-                <div class="pet-card">
-                    <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
-                    <h3>{{ pet.pet_name }}</h3>
-                    <div class="pet-info-row">
-                    <p><strong>Type:</strong> {{ pet.pet_type }}</p>
-                    <p><strong>Breed:</strong> {{ pet.breed or 'N/A' }}</p>
-                    </div>
-                    <div class="pet-info-row">
-                    <p><strong>Gender:</strong> {{ pet.gender or 'N/A' }}</p>
-                    <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%Y-%m-%d') }}</p>
-                    </div>
-                    <hr>
-                    <div class="pet-description">
-                    <p><strong>Description:</strong> {{ pet.description or 'N/A' }}</p>
-                    <p><strong>Found Location:</strong> {{ pet.found_location or 'N/A' }}</p>
-                    </div>
-                    <hr>
-                    <div class="pet-reported">
-                        <p><strong>Reported By:</strong> {{ pet.user.name if pet.user else 'Unknown' }}</p>
-                        <p><strong>Email:</strong> {{ pet.user.email if pet.user else 'N/A' }}</p>
-                        <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
-                    </div>
-                    <div class="pet-footer">
-                    <p><strong>Status:</strong> <span class="status-badge pending">Pending</span></p>
-                    <div class="pet-actions">
-                        <a href="{{ url_for('update_found_status', pet_id=pet.id, action='approve') }}" class="approve-btn">✅ Approve</a>
-                        <a href="{{ url_for('update_found_status', pet_id=pet.id, action='reject') }}" class="reject-btn">❌ Reject</a>
-                    </div>
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>No pending pets.</p>
-            {% endif %}
-        </div>
-
-        <!-- Approved Section -->
-        <div id="approved" class="pet-grid fade">
-            {% if approved_pets %}
-                {% for pet in approved_pets %}
-                <div class="pet-card">
-                    <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
-                    <h3>{{ pet.pet_name }}</h3>
-                    <div class="pet-info-row">
-                    <p><strong>Type:</strong> {{ pet.pet_type }}</p>
-                    <p><strong>Breed:</strong> {{ pet.breed or 'N/A' }}</p>
-                    </div>
-                    <div class="pet-info-row">
-                    <p><strong>Gender:</strong> {{ pet.gender or 'N/A' }}</p>
-                    <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%Y-%m-%d') }}</p>
-                    </div>
-                    <hr>
-                    <div class="pet-description">
-                    <p><strong>Description:</strong> {{ pet.description or 'N/A' }}</p>
-                    <p><strong>Found Location:</strong> {{ pet.found_location or 'N/A' }}</p>
-                    </div>
-                    <hr>
-                    <div class="pet-reported">
-                        <p><strong>Reported By:</strong> {{ pet.user.name if pet.user else 'Unknown' }}</p>
-                        <p><strong>Email:</strong> {{ pet.user.email if pet.user else 'N/A' }}</p>
-                        <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
-                    </div>
-                    <div class="pet-footer">
-                    <p><strong>Status:</strong> <span class="status-badge approved">Approved</span></p>
-                    <div class="pet-actions">
-                        <a href="#" onclick="openEditModal({{ pet.id }})" class="edit-btn">✏️ Edit</a>
-                        <form action="{{ url_for('delete_found_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
-                            <button type="submit" class="delete-btn">🗑️ Delete</button>
-                        </form>
-                    </div>
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>No approved pets.</p>
-            {% endif %}
-        </div>
-
-        <!-- Rejected Section -->
-        <div id="rejected" class="pet-grid fade">
-            {% if rejected_pets %}
-                {% for pet in rejected_pets %}
-                <div class="pet-card">
-                    <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
-                    <h3>{{ pet.pet_name }}</h3>
-                    <div class="pet-info-row">
-                    <p><strong>Type:</strong> {{ pet.pet_type }}</p>
-                    <p><strong>Breed:</strong> {{ pet.breed or 'N/A' }}</p>
-                    </div>
-                    <div class="pet-info-row">
-                    <p><strong>Gender:</strong> {{ pet.gender or 'N/A' }}</p>
-                    <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%Y-%m-%d') }}</p>
-                    </div>
-                    <hr>
-                    <div class="pet-description">
-                    <p><strong>Description:</strong> {{ pet.description or 'N/A' }}</p>
-                    <p><strong>Found Location:</strong> {{ pet.found_location or 'N/A' }}</p>
-                    </div>
-                    <hr>
-                    <div class="pet-reported">
-                        <p><strong>Reported By:</strong> {{ pet.user.name if pet.user else 'Unknown' }}</p>
-                        <p><strong>Email:</strong> {{ pet.user.email if pet.user else 'N/A' }}</p>
-                        <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
-                    </div>
-                    <div class="pet-footer">
-                    <p><strong>Status:</strong> <span class="status-badge rejected">Rejected</span></p>
-                    <div class="pet-actions">
-                        <form action="{{ url_for('delete_found_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
-                            <button type="submit" class="delete-btn">🗑️ Delete</button>
-                        </form>
-                    </div>
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>No rejected pets.</p>
-            {% endif %}
-        </div>
+  <!-- Status Cards -->
+  <div class="status-cards">
+    <div class="status-card" onclick="showSection('pending')">
+      <h3>Pending</h3>
+      <span>{{ pending_count }}</span>
     </div>
+    <div class="status-card" onclick="showSection('approved')">
+      <h3>Approved</h3>
+      <span>{{ approved_count }}</span>
+    </div>
+    <div class="status-card" onclick="showSection('rejected')">
+      <h3>Rejected</h3>
+      <span>{{ rejected_count }}</span>
+    </div>
+  </div>
+
+  <div class="pet-sections-container">
+    {% for section, pets, badge in [('pending', pending_pets, 'pending'),
+                                    ('approved', approved_pets, 'approved'),
+                                    ('rejected', rejected_pets, 'rejected')] %}
+    <div id="{{ section }}" class="pet-grid fade {% if section == 'pending' %}show{% endif %}">
+      {% if pets %}
+      <div class="cards-grid">
+        {% for pet in pets %}
+        <div class="pet-card">
+          <div class="pet-image">
+            <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
+          </div>
+
+          <h3>{{ pet.pet_name }}</h3>
+
+          <div class="tags">
+            <span class="tag">{{ pet.pet_type or 'N/A' }}</span>
+            <span class="tag">{{ pet.breed or 'N/A' }}</span>
+            <span class="tag {{ badge|lower }}">{{ badge|capitalize }}</span>
+          </div>
+
+          <!-- LEFT-ALIGNED DETAILS -->
+          <div class="pet-details">
+            <p><strong>Reported By:</strong> {{ pet.user.name if pet.user else 'Unknown' }} ({{ pet.user.email if pet.user else 'N/A' }})</p>
+            <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%Y-%m-%d') if pet.date_found else 'N/A' }}</p>
+            <p><strong>Found Location:</strong> {{ pet.found_location or 'N/A' }}</p>
+          </div>
+
+          <!-- BUTTONS -->
+          <div class="card-buttons">
+            <button class="view-btn" onclick="openPetModal({{ pet.id }})">View</button>
+
+            {% if section == 'pending' %}
+              <a href="{{ url_for('update_found_status', pet_id=pet.id, action='approve') }}" class="approve-btn">Approve</a>
+              <a href="{{ url_for('update_found_status', pet_id=pet.id, action='reject') }}" class="reject-btn">Reject</a>
+            {% elif section == 'approved' %}
+              <a href="#" onclick="openEditModal({{ pet.id }})" class="edit-btn">Edit</a>
+              <form action="{{ url_for('delete_found_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');" class="inline-form">
+                <button type="submit" class="delete-btn">Delete</button>
+              </form>
+            {% elif section == 'rejected' %}
+              <form action="{{ url_for('delete_found_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');" class="inline-form">
+                <button type="submit" class="delete-btn">Delete</button>
+              </form>
+            {% endif %}
+          </div>
+
+          <!-- Pet Detail Modal -->
+          <div class="petmodal" id="petModal-{{ pet.id }}">
+            <div class="pet-modal-content">
+              <button class="close-btn" onclick="closePetModal('{{ pet.id }}')">&times;</button>
+              <h2>{{ pet.pet_name }}</h2>
+              <p><strong>Type:</strong> {{ pet.pet_type }}</p>
+              <p><strong>Breed:</strong> {{ pet.breed }}</p>
+              <p><strong>Gender:</strong> {{ pet.gender }}</p>
+              <p><strong>Description:</strong> {{ pet.description }}</p>
+              <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%d %B %Y') if pet.date_found else 'N/A' }}</p>
+              <p><strong>Found Location:</strong> {{ pet.found_location }}</p>
+              <p><strong>Contact:</strong> {{ pet.mobile }}</p>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+        <p>No {{ section }} pets.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
 </div>
+
 <!-- Edit Pet Modal -->
 <div id="editPetModal" class="modal">
   <div class="modal-content">
@@ -177,7 +124,7 @@
       <label>Description:</label>
       <input type="text" id="edit_description" name="description">
 
-      <label>Last Seen Location:</label>
+      <label>Found Location:</label>
       <input type="text" id="edit_found_location" name="found_location">
 
       <label>Contact Number:</label>
@@ -189,7 +136,7 @@
         <option value="Female">Female</option>
       </select>
 
-      <label>Date Lost:</label>
+      <label>Date Found:</label>
       <input type="date" id="edit_date_found" name="date_found">
 
       <label>Change Image:</label>
@@ -202,13 +149,12 @@
 
 <script>
 function showSection(sectionId) {
-    const sections = document.querySelectorAll('.pet-grid');
-    sections.forEach(s => s.classList.remove('show')); // fade out
-    const target = document.getElementById(sectionId);
-    target.classList.add('show'); // fade in
+  const sections = document.querySelectorAll('.pet-grid');
+  sections.forEach(s => s.classList.remove('show'));
+  document.getElementById(sectionId).classList.add('show');
 }
 
-// Default load = pending
+// Default section
 document.addEventListener('DOMContentLoaded', () => showSection('pending'));
 
 function openEditModal(petId) {
@@ -232,7 +178,6 @@ function closeEditModal() {
   document.getElementById('editPetModal').style.display = "none";
 }
 
-// Submit edited data
 document.getElementById('editPetForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const petId = document.getElementById('edit_pet_id').value;
@@ -250,6 +195,18 @@ document.getElementById('editPetForm').addEventListener('submit', async (e) => {
     location.reload();
   }
 });
+
+function openPetModal(id) {
+  document.getElementById('petModal-' + id).style.display = 'flex';
+}
+function closePetModal(id) {
+  document.getElementById('petModal-' + id).style.display = 'none';
+}
+window.onclick = function(event) {
+  document.querySelectorAll('.petmodal').forEach(modal => {
+    if (event.target === modal) modal.style.display = 'none';
+  });
+};
 </script>
 </body>
 </html>
