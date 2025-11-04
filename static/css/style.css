@@ -717,3 +717,259 @@ body {
     border-top: 1px solid #e0e0e0;
     padding-top: 10px;
 }
+/* 🌿 ------------------------------
+   HERO SECTION
+----------------------------------*/
+.hero-section {
+  background-color: #e6f4ea;
+  padding: 80px 0;
+}
+
+.hero-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hero-text h5 {
+  color: #2e7d32;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.hero-text h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1b1b1b;
+  margin-top: 10px;
+}
+
+.hero-text p {
+  color: #555;
+  margin-top: 15px;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.hero-buttons {
+  margin-top: 25px;
+  display: flex;
+  gap: 15px;
+}
+
+.hero-buttons .btn-primary {
+  background-color: #2e7d32;
+  color: #fff;
+  padding: 12px 25px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+
+.hero-buttons .btn-primary:hover {
+  background-color: #256228;
+}
+
+.hero-buttons .btn-outline {
+  border: 2px solid #2e7d32;
+  color: #2e7d32;
+  padding: 12px 25px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+
+.hero-buttons .btn-outline:hover {
+  background-color: #2e7d32;
+  color: #fff;
+}
+
+.hero-image img {
+  width: 100%;
+  max-width: 6000px;
+  object-fit: contain;
+  margin-top: -40px;
+}
+
+.hero-image img:hover {
+  transform: scale(1.05);
+}
+
+/* 🌿 ------------------------------
+   SERVICES SECTION
+----------------------------------*/
+.services-section {
+  padding: 80px 0;
+  background-color: #fff;
+}
+
+.services-section .section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.services-section h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1b1b1b;
+}
+
+.services-section p {
+  color: #555;
+  font-size: 1rem;
+}
+
+.service-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+.service-card {
+  flex: 1;
+  min-width: 250px;
+  max-width: 300px;
+  background-color: #f9f9f9;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  transition: 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+}
+
+.service-card .icon {
+  font-size: 40px;
+  color: #2e7d32;
+}
+
+.service-card h3 {
+  margin-top: 15px;
+  font-size: 1.3rem;
+  color: #1b1b1b;
+}
+
+.service-card p {
+  color: #555;
+  margin-top: 10px;
+}
+
+.service-card a {
+  color: #2e7d32;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 10px;
+  transition: color 0.3s ease;
+}
+
+.service-card a:hover {
+  color: #256228;
+}
+
+/* 🌿 ------------------------------
+   ABOUT SECTION
+----------------------------------*/
+.about-section {
+  background-color: #e6f4ea;
+  padding: 80px 0;
+}
+
+.about-section .container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.about-text h5 {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.about-text h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1b1b1b;
+}
+
+.about-text p {
+  color: #555;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+.about-text ul {
+  margin-top: 15px;
+  list-style: none;
+  padding: 0;
+}
+
+.about-text ul li {
+  color: #1b1b1b;
+  margin: 8px 0;
+  font-size: 1rem;
+}
+
+.about-text .btn-primary {
+  margin-top: 25px;
+  background-color: #2e7d32;
+  color: #fff;
+  padding: 12px 25px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: 0.3s ease;
+  display: inline-block;
+}
+
+.about-text .btn-primary:hover {
+  background-color: #256228;
+}
+
+.about-image img {
+  width: 85%;
+  max-width: 400px;
+  border-radius: 15px;
+  transition: transform 0.4s ease;
+}
+
+.about-image img:hover {
+  transform: scale(1.05);
+}
+
+/* 🌿 ------------------------------
+   RESPONSIVE DESIGN
+----------------------------------*/
+@media (max-width: 992px) {
+  .hero-content,
+  .about-section .container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero-image img,
+  .about-image img {
+    margin-top: 30px;
+  }
+
+  .service-card {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+
+  .services-section h2,
+  .about-text h2 {
+    font-size: 1.6rem;
+  }
+}

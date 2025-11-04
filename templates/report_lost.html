@@ -149,7 +149,7 @@
           <div class="pet-image">
             <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
           </div>
-            <h3>{{ pet.pet_name }}</h3>
+            <h3>{{ pet.pet_name }} (<span>ID:{{ pet.id }}</span>)</h3>
             <div class="tags">
               <span class="tag">{{ pet.pet_type }}</span>
               <span class="tag">{{ pet.gender }}</span>

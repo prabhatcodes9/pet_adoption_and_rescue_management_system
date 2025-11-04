@@ -23,77 +23,77 @@
         </div>
     </header>
 
-    <!-- Pet Gallery Section -->
-    <section class="pet-gallery">
-        <div class="container">
-            <div class="section-header">
-                <h2>Meet Our Adorable Friends</h2>
-                <p>These loving pets are waiting for their forever homes. Each one has a unique personality and is ready to become a cherished member of your family.</p>
-            </div>
-            
-            <div class="pet-grid">
-                <div class="pet-card" data-testid="card-pet-1">
-                    <div class="pet-image">
-                        <div class="placeholder-image">🐕</div>
-                    </div>
-                    <div class="pet-info">
-                        <h3>Buddy</h3>
-                        <p>This loving golden retriever is looking for a family to call his own. Buddy loves playing fetch and giving cuddles.</p>
-                    </div>
-                </div>
-                
-                <div class="pet-card" data-testid="card-pet-2">
-                    <div class="pet-image">
-                        <div class="placeholder-image">🐱</div>
-                    </div>
-                    <div class="pet-info">
-                        <h3>Whiskers</h3>
-                        <p>A gentle gray tabby who enjoys quiet afternoons by the window. Whiskers would be perfect for a calm, loving home.</p>
-                    </div>
-                </div>
-                
-                <div class="pet-card" data-testid="card-pet-3">
-                    <div class="pet-image">
-                        <div class="placeholder-image">🐕‍🦺</div>
-                    </div>
-                    <div class="pet-info">
-                        <h3>Scout</h3>
-                        <p>An energetic border collie ready for adventure! Scout needs an active family who loves outdoor activities.</p>
-                    </div>
-                </div>
-                
-                <div class="pet-card" data-testid="card-pet-4">
-                    <div class="pet-image">
-                        <div class="placeholder-image">🐈</div>
-                    </div>
-                    <div class="pet-info">
-                        <h3>Mango</h3>
-                        <p>This playful orange kitten is full of energy and love. Mango will bring joy and laughter to your home.</p>
-                    </div>
-                </div>
+<!-- Hero Section -->
+<section class="hero-section" style="background-color:#e6f4ea; padding:80px 0;">
+  <div class="container hero-content" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+    <div class="hero-text" style="flex:1; min-width:300px;">
+      <h5 style="color:#2e7d32; font-weight:600;">— Hello, We're PetConnect</h5>
+      <h1 style="font-size:2.5rem; font-weight:700; color:#1b1b1b; margin-top:10px;">
+        We Take Care of Your Pets as if They Were Our Own.
+      </h1>
+      <p style="color:#555; margin-top:15px; font-size:1.1rem;">
+        Welcome to PetConnect! We make sure that every pet finds love, care, and the perfect home.
+      </p>
+      <div class="hero-buttons" style="margin-top:25px; display:flex; gap:15px;">
+        <a href="mailto:petconnect.help@gmail.com" class="btn btn-outline" style="border:2px solid #2e7d32; color:#2e7d32; padding:12px 25px; border-radius:6px; text-decoration:none;">Contact Us</a>
+      </div>
+    </div>
+    <div class="hero-image" style="flex:1; min-width:300px; text-align:center; margin-top:30px;">
+      <img src="{{ url_for('static', filename='images/WhatsApp_Image_2025-11-04_at_20.15.16-removebg-preview.png') }}" alt="Happy Dog" style="width:90%; max-width:450px; margin-top:-40px; object-fit:contain;">
+    </div>
+  </div>
+</section>
 
-                <div class="pet-card" data-testid="card-pet-5">
-                    <div class="pet-image">
-                        <div class="placeholder-image">🐎</div>
-                    </div>
-                    <div class="pet-info">
-                        <h3>Storm</h3>
-                        <p>This playful and speedy Horse is full of energy and love. Storm will bring joy and laughter to your home.</p>
-                    </div>
-                </div>
+<!-- Services Section -->
+<section class="services-section" style="padding:80px 0; background-color:#fff;">
+  <div class="container">
+    <div class="section-header" style="text-align:center; margin-bottom:50px;">
+      <h2 style="font-size:2rem; font-weight:700; color:#1b1b1b;">Our Services</h2>
+      <p style="color:#555;">We ensure your pet receives the best care possible through our dedicated services.</p>
+    </div>
+    <div class="service-grid" style="display:flex; flex-wrap:wrap; justify-content:center; gap:30px;">
+      <!-- Pet Vaccination -->
+      <div class="service-card" style="flex:1; min-width:250px; max-width:300px; background-color:#f9f9f9; padding:30px; border-radius:12px; text-align:center; transition:0.3s; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
+        <div class="icon" style="font-size:40px; color:#2e7d32;">🐶</div>
+        <h3 style="margin-top:15px; font-size:1.3rem; color:#1b1b1b;">Lost Pets</h3>
+        <p style="color:#555; margin-top:10px;">You can report your pet or if you find someone's pet you can give them.</p>
+      </div>
 
-                <div class="pet-card" data-testid="card-pet-6">
-                    <div class="pet-image">
-                        <div class="placeholder-image">🐄</div>
-                    </div>
-                    <div class="pet-info">
-                        <h3>Gauri</h3>
-                        <p>This playful and cute Cow is full of energy and love. Gauri will bring joy and laughter to your home.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+      <!-- Microchipping -->
+      <div class="service-card" style="flex:1; min-width:250px; max-width:300px; background-color:#f9f9f9; padding:30px; border-radius:12px; text-align:center; transition:0.3s; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
+        <div class="icon" style="font-size:40px; color:#2e7d32;">🔖</div>
+        <h3 style="margin-top:15px; font-size:1.3rem; color:#1b1b1b;">Found Pets</h3>
+        <p style="color:#555; margin-top:10px;">If you found someone's or if you found someone's lost pet listed here.</p>
+      </div>
+
+      <!-- Pet Sitting -->
+      <div class="service-card" style="flex:1; min-width:250px; max-width:300px; background-color:#f9f9f9; padding:30px; border-radius:12px; text-align:center; transition:0.3s; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
+        <div class="icon" style="font-size:40px; color:#2e7d32;">🏠</div>
+        <h3 style="margin-top:15px; font-size:1.3rem; color:#1b1b1b;">Adopt Pet</h3>
+        <p style="color:#555; margin-top:10px;">Here You can find perfect companion for yourself.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section" style="background-color:#e6f4ea; padding:80px 0;">
+  <div class="container" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+    <div class="about-text" style="flex:1; min-width:300px;">
+      <h5 style="color:#2e7d32; font-weight:600;">— About Us</h5>
+      <h2 style="font-size:2rem; font-weight:700; color:#1b1b1b;">We Do Our Best to Keep Your Pets Safe</h2>
+      <p style="color:#555; margin-top:10px;">PetConnect has been serving pets and owners for over a decade. We’ve helped thousands of pets find their forever homes and provided guidance for their well-being.</p>
+      <ul style="margin-top:15px; color:#1b1b1b; list-style:none; padding:0;">
+        <li>🐾 Lost a Pet: Report it on our platform so nearby users can help locate your furry friend</li>
+        <li>🐾 Found a Pet: Upload the pet’s details and help us reunite them with their owner.</li>
+        <li>🐾 Want to Adopt: Explore the list of abandoned or rescued pets ready for adoption.</li>
+      </ul>
+    </div>
+    <div class="about-image" style="flex:1; min-width:300px; text-align:center; margin-top:30px;">
+      <img src="{{ url_for('static', filename='images/WhatsApp_Image_2025-11-04_at_20.28.40-removebg-preview.png') }}" alt="Pet Care Team" style="width:100%; max-width:400px; border-radius:15px;">
+    </div>
+  </div>
+</section>
     <!-- Login Modal -->
     <div id="loginModal" class="modal" data-testid="modal-login">
         <div class="modal-content">
