@@ -154,9 +154,9 @@
               <span class="tag">{{ pet.pet_type }}</span>
               <span class="tag">{{ pet.gender }}</span>
               {% if pet.pet_status == 'lost' %}
-              <span class="tag">Lost<span>
+              <span class="tag lost">Lost<span>
               {% elif pet.pet_status == 'Founded' %}
-              <span class="tag">Reunited<span>
+              <span class="tag reunited">Reunited<span>
               {% endif %}
             </div>
 

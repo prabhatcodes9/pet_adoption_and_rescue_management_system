@@ -119,8 +119,10 @@
                       <div class="tags">
                         <span class="tag">{{ pet.pet_type }}</span>
                         <span class="tag">{{ pet.breed }}</span>
-                        {% if pet.status == 'adopted' %}
-                        <span class="tag">Adopted</span>
+                        {% if pet.status == 'pending' %}
+                        <span class="tag adoptable">Adoptable</span>
+                        {% elif pet.status == 'adopted' %}
+                        <span class="tag adopted">Adopted</span>
                         {% endif %}
                       </div>
 

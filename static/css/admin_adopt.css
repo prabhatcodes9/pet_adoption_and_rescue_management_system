@@ -102,8 +102,10 @@ body {
 /* Pet Grid */
 .pet-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  position: relative;
+  min-height: 400px;
 }
 
 .pet-grid.show {
@@ -118,19 +120,16 @@ body {
   transition: transform 0.2s ease;
   text-align: center;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
 }
 
 .pet-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-2px);
 }
 
-.pet-card img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 10px;
-}
 
 .pet-card h3 {
   font-size: 1.2rem;
@@ -311,25 +310,7 @@ body {
   color: #2d3748;
 }
 
-/* Image Preview */
-.image-preview {
-  width: 120px;
-  height: 120px;
-  border: 2px dashed #e2e8f0;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  margin-top: 10px;
-  background: #f7fafc;
-}
 
-.image-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
 /* Tab highlight effect */
         .status-card.active {
             background-color: whitesmoke;
@@ -345,3 +326,198 @@ body {
         .pet-grid.show {
             display: grid;
         }
+
+.modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      text-align: left;
+    }
+    .modal-content img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      cursor: pointer;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    /* === Tag Styles === */
+.pet-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  overflow: hidden;
+  text-align: center;
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.pet-card:hover {
+  transform: translateY(-5px);
+}
+
+.pet-image img {
+  width: 100%;
+  height: 275px;
+  object-fit: cover;
+}
+
+.pet-card h3 {
+  margin: 10px 0 5px;
+  color: #333;
+}
+
+.tags {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tag {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  background: #e3f2fd;
+  color: #156a67;
+  font-weight: 500;
+}
+
+.tag.pending {
+  background: #f1c40f;
+  color: #000;
+}
+
+.tag.approved {
+  background: #2ecc71;
+  color: #fff;
+}
+
+.tag.rejected {
+  background: #e74c3c;
+  color: #fff;
+}
+
+    .view-btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .view-btn:hover { background: #0056b3; }
+
+    .tag-row {
+      margin: 10px 0;
+    }
+
+    .pet-details {
+  text-align: left !important;
+  flex-grow: 1;
+  padding: 0 15px;
+  margin-bottom: 10px;
+}
+
+.pet-details p {
+  margin: 4px 0;
+  font-size: 0.95rem;
+  color: #2d3748;
+  line-height: 1.35;
+}
+.pet-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  gap: 10px;
+}
+
+/* Responsive Adjustment */
+@media (max-width: 1024px) {
+  .pet-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 per row on tablets */
+  }
+}
+
+@media (max-width: 600px) {
+  .pet-grid {
+    grid-template-columns: 1fr; /* Single column on mobile */
+  }
+}
+/* Buttons container */
+.card-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0 18px;
+  align-items: center;
+}
+
+/* Ensure consistent sizing for anchors and buttons */
+.card-buttons a,
+.card-buttons button,
+.card-buttons .inline-form {
+  box-sizing: border-box;
+}
+
+/* Style anchors and buttons the same */
+.card-buttons a,
+.card-buttons button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;            /* fixed identical width */
+  height: 36px;           /* fixed identical height */
+  padding: 0 8px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+/* Make sure form doesn't introduce line-break */
+.card-buttons .inline-form {
+  display: inline-block;
+  margin: 0;
+}
+.delete-btn { background-color: #e02424 !important; }
+.view-btn  { background-color: orange !important; }
+/* Hover */
+.card-buttons a:hover,
+.card-buttons button:hover {
+  opacity: 0.92;
+}
+
+/* For very small screens make width automatic but equal height */
+@media (max-width: 420px) {
+  .card-buttons a,
+  .card-buttons button {
+    width: 44%;
+    min-width: 120px;
+    height: 38px;
+  }
+  .card-buttons { gap: 8px; padding: 0 10px; }
+}

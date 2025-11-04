@@ -36,16 +36,38 @@
     }
 
     function showSection(section) {
-        const sections = document.querySelectorAll('.pet-grid');
-        sections.forEach(s => s.classList.remove('show'));
-        document.getElementById(section).classList.add('show');
+      const sections = document.querySelectorAll('.pet-grid');
+      sections.forEach(s => s.classList.remove('show'));
+      document.getElementById(section).classList.add('show');
 
-        const cards = document.querySelectorAll('.status-card');
-        cards.forEach(c => c.classList.remove('active'));
-        document.querySelector(`.status-card[data-section="${section}"]`).classList.add('active');
+      const tabs = document.querySelectorAll('.status-card');
+      tabs.forEach(t => t.classList.remove('active'));
+      document.querySelector(`[data-section="${section}"]`).classList.add('active');
     }
 
-    // Default section
+    function showPetDetails(pet) {
+      const modal = document.getElementById('petDetailModal');
+      modal.querySelector('.modal-content').innerHTML = `
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2>${pet.pet_name}</h2>
+        <div class="tag-row">
+          <span class="tag type">${pet.pet_type}</span>
+          <span class="tag breed">${pet.breed || 'N/A'}</span>
+          <span class="tag status ${pet.status}">${pet.status}</span>
+        </div>
+        <p><strong>Age:</strong> ${pet.age || 'N/A'}</p>
+        <p><strong>Gender:</strong> ${pet.gender || 'N/A'}</p>
+        <p><strong>Description:</strong> ${pet.description || 'N/A'}</p>
+        <p><strong>Location:</strong> ${pet.location || 'N/A'}</p>
+        <p><strong>Mobile:</strong> ${pet.mobile || 'N/A'}</p>
+      `;
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('petDetailModal').style.display = 'none';
+    }
+
     document.addEventListener('DOMContentLoaded', () => showSection('pending'));
 </script>
     
@@ -70,63 +92,102 @@
         </div>
     </div>
 
-    <!-- Pending Pets Section -->
+<!-- Pending Pets -->
     <div class="pet-grid" id="pending">
-        {% set pending_pets = pet_data | selectattr("pet.status", "equalto", "pending") | list %}
-        {% if pending_pets %}
-            {% for item in pending_pets %}
-                <div class="pet-card">
-                    <img src="{{ url_for('static', filename='uploads/' + (item.pet.image or 'default.png')) }}" alt="{{ item.pet.pet_name }}">
-                    <h3>{{ item.pet.pet_name }}</h3>
-                    <p><strong>Type:</strong> {{ item.pet.pet_type }}</p>
-                    <p><strong>Breed:</strong> {{ item.pet.breed or 'N/A' }}</p>
-                    <p><strong>Age:</strong> {{ item.pet.age or 'N/A' }}</p>
-                    <p><strong>Gender:</strong> {{ item.pet.gender or 'N/A' }}</p>
-                    <p><strong>Description:</strong> {{ item.pet.description or 'N/A' }}</p>
-                    <p><strong>Location:</strong> {{ item.pet.location or 'N/A' }}</p>
-                    <p><strong>Mobile:</strong> {{ item.pet.mobile or 'N/A' }}</p>
-                    <p><strong>Status:</strong> <span class="status-badge pending">Pending</span></p>
-
-                    <div class="pet-actions">
-                        <form action="{{ url_for('delete_adopt_pet', pet_id=item.pet.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this pet?');">
-                            <button type="submit" class="delete-btn">🗑️ Delete</button>
-                        </form>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No pending pets found.</p>
-        {% endif %}
-    </div>
-
-    <!-- Adopted Pets Section -->
-    <div class="pet-grid" id="adopted">
-        {% set adopted_pets = pet_data | selectattr("pet.status", "equalto", "adopted") | list %}
-        {% if adopted_pets %}
-            {% for item in adopted_pets %}
-                <div class="pet-card">
-                    <img src="{{ url_for('static', filename='uploads/' + (item.pet.image or 'default.png')) }}" alt="{{ item.pet.pet_name }}">
-                    <h3>{{ item.pet.pet_name }}</h3>
-                    <p><strong>Type:</strong> {{ item.pet.pet_type }}</p>
-                    <p><strong>Breed:</strong> {{ item.pet.breed or 'N/A' }}</p>
-                    <p><strong>Age:</strong> {{ item.pet.age or 'N/A' }}</p>
-                    <p><strong>Gender:</strong> {{ item.pet.gender or 'N/A' }}</p>
-                    <p><strong>Description:</strong> {{ item.pet.description or 'N/A' }}</p>
-                    <p><strong>Location:</strong> {{ item.pet.location or 'N/A' }}</p>
-                    <p><strong>Mobile:</strong> {{ item.pet.mobile or 'N/A' }}</p>
-                    <p><strong>Status:</strong> <span class="status-badge adopted">Adopted</span></p>
-
-                                <div class="pet-actions">
-                        <form action="{{ url_for('delete_adopt_pet', pet_id=item.pet.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this pet?');">
-                            <button type="submit" class="delete-btn">🗑️ Delete</button>
-                        </form>
+      {% set pending_pets = pet_data | selectattr("pet.status", "equalto", "pending") | list %}
+      {% if pending_pets %}
+        {% for item in pending_pets %}
+          <div class="pet-card">
+            <div class="pet-image">
+                <img src="{{ url_for('static', filename='uploads/' + (item.pet.image or 'default.png')) }}" alt="{{ item.pet.pet_name }}">
             </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No adopted pets found.</p>
-        {% endif %}
+            <h3>{{ item.pet.pet_name }}</h3>
+
+            <div class="tags">
+              <span class="tag type">{{ item.pet.pet_type }}</span>
+              <span class="tag breed">{{ item.pet.breed or 'N/A' }}</span>
+              <span class="tag status pending">Adoptable</span>
+            </div>
+
+            <div class="pet-details">
+                <p><strong>Details:</strong>{{ item.pet.description or 'N/A' }}</p>
+                <p><strong>Location:</strong>{{ item.pet.location or 'N/A' }}</p>
+            </div>
+
+            <div class="card-buttons">
+              <button class="view-btn" onclick='showPetDetails({ 
+                "pet_name": "{{ item.pet.pet_name }}",
+                "pet_type": "{{ item.pet.pet_type }}",
+                "breed": "{{ item.pet.breed }}",
+                "age": "{{ item.pet.age }}",
+                "gender": "{{ item.pet.gender }}",
+                "description": "{{ item.pet.description }}",
+                "location": "{{ item.pet.location }}",
+                "mobile": "{{ item.pet.mobile }}",
+                "status": "pending"
+              })'>View</button>
+
+              <form action="{{ url_for('delete_adopt_pet', pet_id=item.pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
+                <button type="submit" class="delete-btn">Delete</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>No pending pets found.</p>
+      {% endif %}
     </div>
-</div>
+
+    <!-- Adopted Pets -->
+    <div class="pet-grid" id="adopted">
+      {% set adopted_pets = pet_data | selectattr("pet.status", "equalto", "adopted") | list %}
+      {% if adopted_pets %}
+        {% for item in adopted_pets %}
+          <div class="pet-card">
+            <div class="pet-image">
+                <img src="{{ url_for('static', filename='uploads/' + (item.pet.image or 'default.png')) }}" alt="{{ item.pet.pet_name }}">
+            </div>
+            <h3>{{ item.pet.pet_name }}</h3>
+
+            <div class="tag-row">
+              <span class="tag type">{{ item.pet.pet_type }}</span>
+              <span class="tag breed">{{ item.pet.breed or 'N/A' }}</span>
+              <span class="tag status adopted">Adopted</span>
+            </div>
+
+            <div class="pet-details">
+                <p><strong>Details:</strong>{{ item.pet.description or 'N/A' }}</p>
+                <p><strong>Location:</strong> {{ item.pet.location or 'N/A' }}</p>
+            </div>
+
+            <div class="card-buttons">
+              <button class="view-btn" onclick='showPetDetails({ 
+                "pet_name": "{{ item.pet.pet_name }}",
+                "pet_type": "{{ item.pet.pet_type }}",
+                "breed": "{{ item.pet.breed }}",
+                "age": "{{ item.pet.age }}",
+                "gender": "{{ item.pet.gender }}",
+                "description": "{{ item.pet.description }}",
+                "location": "{{ item.pet.location }}",
+                "mobile": "{{ item.pet.mobile }}",
+                "status": "adopted"
+              })'>View</button>
+
+              <form action="{{ url_for('delete_adopt_pet', pet_id=item.pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
+                <button type="submit" class="delete-btn">Delete</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>No adopted pets found.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Pet Detail Modal -->
+  <div id="petDetailModal" class="modal">
+    <div class="modal-content"></div>
+  </div>
 </body>
 </html>

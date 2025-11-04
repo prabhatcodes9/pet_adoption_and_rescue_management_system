@@ -792,6 +792,11 @@ body {
   font-weight: 500;
 }
 
+.tag.reunited {
+  background: #2ecc71;
+  color: #fff;
+}
+
 .details {
   text-align: left;
   padding: 0 20px 15px;
