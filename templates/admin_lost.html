@@ -38,57 +38,64 @@
                                         ('rejected', rejected_pets, 'rejected')] %}
         <div id="{{ section }}" class="pet-grid fade {% if section == 'pending' %}show{% endif %}">
             {% if pets %}
+            <div class="cards-grid">
                 {% for pet in pets %}
                 <div class="pet-card">
-  <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
-  
-  <h3>{{ pet.pet_name }}</h3>
+                  <div class="pet-image">
+                    <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
+                  </div>
 
-  <div class="pet-info-row">
+                  <h3>{{ pet.pet_name }}</h3>
+
+                  <div class="tags">
+                    <span class="tag">{{ pet.pet_type or 'N/A' }}</span>
+                    <span class="tag">{{ pet.breed or 'N/A' }}</span>
+                    <span class="tag {{ badge|lower }}">{{ badge|capitalize }}</span>
+                  </div>
+
+                 <!-- LEFT-ALIGNED DETAILS -->
+                  <div class="pet-details">
+                    <p><strong>Reported By:</strong> {{ pet.user.name if pet.user else 'Unknown' }} ({{ pet.user.email if pet.user else 'N/A' }})</p>
+                    <p><strong>Date Lost:</strong> {{ pet.date_lost.strftime('%Y-%m-%d') if pet.date_lost else 'N/A' }}</p>
+                    <p><strong>Last Seen:</strong> {{ pet.last_seen_location or 'N/A' }}</p>
+                  </div>
+
+                  <!-- BUTTONS (centered; equal size) -->
+                  <div class="card-buttons">
+                    <button class="view-btn" onclick="openPetModal({{ pet.id }})">View</button>
+                    {% if section == 'pending' %}
+                      <a href="{{ url_for('update_lost_status', pet_id=pet.id, action='approve') }}" class="approve-btn">Approve</a>
+                      <a href="{{ url_for('update_lost_status', pet_id=pet.id, action='reject') }}" class="reject-btn">Reject</a>
+                    {% elif section == 'approved' %}
+                      <a href="#" onclick="openEditModal({{ pet.id }})" class="edit-btn">Edit</a>
+                      <form action="{{ url_for('delete_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');" class="inline-form">
+                        <button type="submit" class="delete-btn">Delete</button>
+                      </form>
+                    {% elif section == 'rejected' %}
+                      <form action="{{ url_for('delete_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');" class="inline-form">
+                        <button type="submit" class="delete-btn">Delete</button>
+                      </form>
+                    {% endif %}
+                  </div>
+                  <!-- Pet Detail Modal -->
+<div class="petmodal" id="petModal-{{ pet.id }}">
+  <div class="pet-modal-content">
+    <button class="close-btn" onclick="closePetModal('{{ pet.id }}')">&times;</button>
+    <h2>{{ pet.pet_name }}</h2>
     <p><strong>Type:</strong> {{ pet.pet_type }}</p>
-    <p><strong>Breed:</strong> {{ pet.breed or 'N/A' }}</p>
-  </div>
-  <div class="pet-info-row">
-    <p><strong>Gender:</strong> {{ pet.gender or 'N/A' }}</p>
-    <p><strong>Date Lost:</strong> {{ pet.date_lost.strftime('%Y-%m-%d') }}</p>
-  </div>
-
-  <hr>
-
-  <div class="pet-description">
-    <p><strong>Description:</strong> {{ pet.description or 'N/A' }}</p>
-    <p><strong>Lost Location:</strong> {{ pet.last_seen_location or 'N/A' }}</p>
-  </div>
-
-  <hr>
-
-  <div class="pet-reported">
-    <p><strong>Reported By:</strong> {{ pet.user.name if pet.user else 'Unknown' }}</p>
-    <p><strong>Email:</strong> {{ pet.user.email if pet.user else 'N/A' }}</p>
-    <p><strong>Contact:</strong> {{ pet.mobile or 'N/A' }}</p>
-  </div>
-
-  <div class="pet-footer">
-    <p><strong>Status:</strong> <span class="status-badge {{ badge|lower }}">{{ badge|capitalize }}</span></p>
-
-    <div class="pet-actions">
-      {% if section == 'pending' %}
-        <a href="{{ url_for('update_lost_status', pet_id=pet.id, action='approve') }}" class="approve-btn">✅ Approve</a>
-        <a href="{{ url_for('update_lost_status', pet_id=pet.id, action='reject') }}" class="reject-btn">❌ Reject</a>
-      {% elif section == 'approved' %}
-        <a href="#" onclick="openEditModal({{ pet.id }})" class="edit-btn">✏️ Edit</a>
-        <form action="{{ url_for('delete_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
-          <button type="submit" class="delete-btn">🗑️ Delete</button>
-        </form>
-      {% elif section == 'rejected' %}
-        <form action="{{ url_for('delete_pet', pet_id=pet.id) }}" method="POST" onsubmit="return confirm('Delete this pet?');">
-          <button type="submit" class="delete-btn">🗑️ Delete</button>
-        </form>
-      {% endif %}
-    </div>
+    <p><strong>Breed:</strong> {{ pet.breed }}</p>
+    <p><strong>Gender:</strong> {{ pet.gender }}</p>
+    <p><strong>Description:</strong> {{ pet.description }}</p>
+    <p><strong>Date Lost:</strong> {{ pet.date_lost.strftime('%d %B %Y') if pet.date_lost else 'N/A' }}</p>
+    <p><strong>Last Seen Location:</strong> {{ pet.last_seen_location }}</p>
+    <p><strong>Contact:</strong> {{ pet.mobile }}</p>
   </div>
 </div>
+                </div>
+
                 {% endfor %}
+            </div>
+ 
             {% else %}
                 <p>No {{ section }} pets.</p>
             {% endif %}
@@ -189,6 +196,20 @@ document.getElementById('editPetForm').addEventListener('submit', async (e) => {
     location.reload();
   }
 });
+function openPetModal(id) {
+  document.getElementById('petModal-' + id).style.display = 'flex';
+}
+function closePetModal(id) {
+  document.getElementById('petModal-' + id).style.display = 'none';
+}
+window.onclick = function(event) {
+  document.querySelectorAll('.petmodal').forEach(modal => {
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+};
+
 </script>
 </body>
 </html>
