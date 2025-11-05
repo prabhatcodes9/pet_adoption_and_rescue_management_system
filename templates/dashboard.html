@@ -83,36 +83,28 @@
             </div>
             
             <div class="cards-grid">
-                <div class="action-card" data-testid="card-action-lost" onclick="window.location.href='{{ url_for('report_lost') }}'" style="cursor: pointer;">
-                    <div class="card-icon search-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="21 21l-4.35-4.35"></path>
-                        </svg>
-                    </div>
+                <div class="action-card" onclick="window.location.href='{{ url_for('report_lost') }}'">
+                    <div class="card-icon"><i data-lucide="search"></i></div>
                     <h3>Lost Pets</h3>
                     <p>Report a missing pet or help search for lost companions in your area.</p>
                 </div>
                 
-                <div class="action-card" data-testid="card-action-lost" onclick="window.location.href='{{ url_for('report_found') }}'" style="cursor: pointer;">
-                    <div class="card-icon heart-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                        </svg>
-                    </div>
+                <div class="action-card" onclick="window.location.href='{{ url_for('report_found') }}'">
+                    <div class="card-icon"><i data-lucide="heart"></i></div>
                     <h3>Found Pets</h3>
                     <p>Report a found pet to help reunite them with their loving family.</p>
                 </div>
-                
-                <div class="action-card" data-testid="card-action-adopt" onclick="window.location.href='{{ url_for('report_adopt') }}'" style="cursor: pointer;">
-                    <div class="card-icon home-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                            <polyline points="9,22 9,12 15,12 15,22"></polyline>
-                        </svg>
-                    </div>
+
+                <div class="action-card" onclick="window.location.href='{{ url_for('report_adopt') }}'">
+                    <div class="card-icon"><i data-lucide="home"></i></div>
                     <h3>Adopt a Pet</h3>
                     <p>Browse available pets and find your perfect furry companion.</p>
+                </div>
+
+                <div class="action-card" onclick="window.location.href='{{ url_for('reunited_pets') }}'">
+                    <div class="card-icon"><i data-lucide="paw-print"></i></div>
+                    <h3>Reunited or Adopted</h3>
+                    <p>Browse pets that got their loving owner.</p>
                 </div>
             </div>
         </div>
@@ -139,6 +131,8 @@
         <p>©️ 2025 PetConnect. All rights reserved.</p>
     </div>
 </footer>
+
+<script>lucide.createIcons();</script>
     <!-- JS for Notification Popup -->
   <script>
     const notifBtn = document.getElementById("notifBtn");

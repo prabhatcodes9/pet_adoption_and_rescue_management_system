@@ -185,7 +185,9 @@ body {
 }
 
 .cards-grid {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 40px;
 }
@@ -198,6 +200,8 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     border: 1px solid #e2e8f0;
+    flex: 1 1 300px;
+    max-width: 320px;
 }
 
 .action-card:hover {
@@ -752,4 +756,9 @@ body {
   border-radius: 50%;
   font-size: 0.7rem;
   padding: 2px 5px;
+}
+.center-card {
+    display: flex;
+    justify-content: center;
+    margin-top: 80px;
 }

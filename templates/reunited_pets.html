@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetConnect - Find Your Perfect Pet Companion</title>
+    <meta name="description" content="Connect with loving pets in need of homes. Find lost pets, report found animals, and discover your perfect pet companion through our adoption services.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/report_lost.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🐾</span>
+                    <h1 class="logo-text">Welcome {{ user.name }} !</h1>
+                </div>
+                <nav class="header-nav">
+                <a href="{{ url_for('user_dashboard') }}" class="btn btn-primary">Dashboard</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!---All Pets List-->
+<section class="all-pets-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Reunited or Adopted Pets</h2>
+    </div>
+
+    <div class="cards-grid">
+      {% if pets %}
+        {% for pet in pets %}
+          <div class="pet-card">
+            <div class="pet-image">
+              <img src="{{ url_for('static', filename='uploads/' + pet.image) }}" alt="{{ pet.pet_name }}">
+            </div>
+
+            <h3>{{ pet.pet_name }} (<span>ID:{{ pet.id }}</span>)</h3>
+
+            <div class="tags">
+              <span class="tag">{{ pet.pet_type }}</span>
+              <span class="tag">{{ pet.breed }}</span>
+
+              {% if pet.pet_status == 'Founded' %}
+                <span class="tag reunited">Reunited</span>
+              {% elif pet.pet_status == 'Claimed' %}
+                <span class="tag claim">Reunited</span>
+              {% elif pet.status == 'adopted' %}
+                <span class="tag adopt">Adopted</span>
+              {% endif %}
+            </div>
+
+            <div class="details">
+              {% if pet.__tablename__ == 'lost_pet' %}
+                <p><strong>Date Lost:</strong> {{ pet.date_lost.strftime('%d %B %Y') if pet.date_lost else 'N/A' }}</p>
+                <p><strong>Last Seen:</strong> {{ pet.last_seen_location }}</p>
+              {% elif pet.__tablename__ == 'found_pet' %}
+                <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%d %B %Y') if pet.date_found else 'N/A' }}</p>
+                <p><strong>Found Location:</strong> {{ pet.found_location }}</p>
+              {% elif pet.__tablename__ == 'adopt_pet' %}
+                <p><strong>Details:</strong> {{ pet.description }}</p>
+                <p><strong>Location:</strong> {{ pet.location }}</p>
+              {% endif %}
+            </div>
+
+            <button class="view-btn" onclick="openPetModal('{{ pet.id }}')">View Details</button>
+          </div>
+
+          <!-- Modal -->
+          <div class="petmodal" id="petModal-{{ pet.id }}">
+            <div class="pet-modal-content">
+              <button class="close-btn" onclick="closePetModal('{{ pet.id }}')">&times;</button>
+              <h2>{{ pet.pet_name }}</h2>
+              <p><strong>Type:</strong> {{ pet.pet_type }}</p>
+              <p><strong>Breed:</strong> {{ pet.breed }}</p>
+              <p><strong>Gender:</strong> {{ pet.gender }}</p>
+              <p><strong>Description:</strong> {{ pet.description }}</p>
+
+              {% if pet.__tablename__ == 'lost_pet' %}
+                <p><strong>Date Lost:</strong> {{ pet.date_lost.strftime('%d %B %Y') if pet.date_lost else 'N/A' }}</p>
+                <p><strong>Last Seen Location:</strong> {{ pet.last_seen_location }}</p>
+              {% elif pet.__tablename__ == 'found_pet' %}
+                <p><strong>Date Found:</strong> {{ pet.date_found.strftime('%d %B %Y') if pet.date_found else 'N/A' }}</p>
+                <p><strong>Found Location:</strong> {{ pet.found_location }}</p>
+              {% elif pet.__tablename__ == 'adopt_pet' %}
+                <p><strong>Address:</strong> {{ pet.location }}</p>
+              {% endif %}
+
+              <p><strong>Contact:</strong> {{ pet.mobile }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="no-data">No reunited or adopted pets yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<script>
+function openPetModal(id) {
+  document.getElementById('petModal-' + id).style.display = 'flex';
+}
+function closePetModal(id) {
+  document.getElementById('petModal-' + id).style.display = 'none';
+}
+window.onclick = function(event) {
+  document.querySelectorAll('.petmodal').forEach(modal => {
+    if (event.target === modal) modal.style.display = 'none';
+  });
+};
+</script>
+
+</body>
+</html>
+
+
+                

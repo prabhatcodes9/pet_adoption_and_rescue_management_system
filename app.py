@@ -840,7 +840,9 @@ def report_lost():
         flash('Lost pet reported successfully!')
         return redirect(url_for('report_lost'))
     
-    lost_pets = LostPet.query.filter_by(status='approved').order_by(LostPet.id.desc()).all()
+    lost_pets = LostPet.query.filter(
+        (LostPet.status == 'approved') & (LostPet.pet_status == 'lost')
+    ).order_by(LostPet.id.desc()).all()
     chat_room = ChatRoom.query.filter(
         ((ChatRoom.user1_id == current_user.id) | (ChatRoom.user2_id == current_user.id)) &
         (ChatRoom.active == True)
@@ -887,7 +889,7 @@ def report_adopt():
         flash("Adoption pet reported successfully!", "success")
         return redirect(url_for('report_adopt'))
 
-    adopt_pets = AdoptPet.query.order_by(AdoptPet.id.desc()).all()
+    adopt_pets = AdoptPet.query.filter(AdoptPet.status == 'pending').order_by(AdoptPet.id.desc()).all()
     return render_template('report_adopt.html', user=current_user, adopt_pets=adopt_pets)
 
 @app.route('/user/my_lost_requests')
@@ -941,7 +943,9 @@ def report_found():
         flash('Found pet reported successfully!')
         return redirect(url_for('report_found'))
     
-    found_pets = FoundPet.query.filter_by(status='approved').order_by(FoundPet.id.desc()).all()
+    found_pets = FoundPet.query.filter(
+        (FoundPet.status == 'approved') & (FoundPet.pet_status == 'found')
+    ).order_by(FoundPet.id.desc()).all()
     chat_room = FoundChatRoom.query.filter(
         ((FoundChatRoom.user1_id == current_user.id) | (FoundChatRoom.user2_id == current_user.id)) &
         (FoundChatRoom.active == True)
@@ -1731,6 +1735,18 @@ def mark_chat_as_read(user_id):
     ).update({'is_read': True})
     db.session.commit()
     return jsonify({'success': True})
+
+@app.route('/reunited_pets')
+@login_required
+def reunited_pets():
+    reunited_lost = LostPet.query.filter_by(pet_status='Founded').all()
+    reunited_found = FoundPet.query.filter_by(pet_status='Claimed').all()
+    adopted_pets = AdoptPet.query.filter_by(status='adopted').all()
+
+    all_reunited = reunited_lost + reunited_found + adopted_pets
+
+    return render_template('reunited_pets.html',user=current_user, pets=all_reunited)
+
 # ----------- Admin User Creation -----------
 with app.app_context():
     admins = [
