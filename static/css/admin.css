@@ -5,70 +5,188 @@
     box-sizing: border-box;
 }
 
+/* Apply background image to entire page except header */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #ffffff;
-    color: #333;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     line-height: 1.6;
+    color: #2d3748;
+    background: 
+        linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
+        url("/static/images/freepik__talk__24972-removebg-preview.png") no-repeat center center fixed;
+    background-size: cover;
+    font-size: 16px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
+
+/* Keep header white and solid */
+.header {
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
-    min-height: 100vh;
+    padding: 0 24px;
 }
 
-/* Dashboard Header */
-.dashboard-header {
-    text-align: center;
-    margin-bottom: 40px;
-    padding: 30px 0;
-    border-bottom: 2px solid #f0f0f0;
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.dashboard-header h1 {
-    font-size: 2.5rem;
-    color: #2c3e50;
-    margin-bottom: 10px;
-    font-weight: 600;
-}
-
-.dashboard-header p {
-    font-size: 1.1rem;
-    color: #7f8c8d;
-}
-
-/* Action Buttons */
-.action-buttons {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
-    margin: 40px 0;
-}
-
-.action-btn {
-    background: #ffffff;
-    border: 2px solid #e1e8ed;
-    border-radius: 12px;
-    padding: 40px 30px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    min-height: 180px;
+.logo {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
+}
+
+.logo-icon {
+    font-size: 28px;
+}
+
+.logo-text {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2b7a78;
+}
+
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.welcome-text {
+    color: #718096;
+    font-weight: 500;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #ff7b51, #8bc6ec);
+  padding: 12px 40px;
+  color: #fff;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.nav-left nav a {
+  color: #fff;
+  text-decoration: none;
+  margin-right: 18px;
+  font-weight: 500;
+}
+
+.nav-left nav a.active,
+.nav-left nav a:hover {
+  text-decoration: underline;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logout-btn, .theme-toggle {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.logout-btn:hover, .theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+/* Header Section */
+.admin-header {
+  text-align: left;
+  padding: 40px;
+  background: linear-gradient(120deg, #2b7a78, #5ca87b);
+  color: white;
+  border-radius: 10px;
+  margin: 25px auto;
+  max-width: 1100px;
+}
+
+.admin-badge {
+  background: rgba(255,255,255,0.2);
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+}
+
+.admin-actions {
+  margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
     text-decoration: none;
-    color: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    transform: translateY(-1px);
 }
 
-.action-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+.btn-primary {
+    background-color: #2b7a78;
+    color: white;
 }
 
+.btn-primary:hover {
+    background-color: #1a5f5e;
+    transform: translateY(-1px);
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: #2b7a78;
+    border: 2px solid #2b7a78;
+}
+
+.btn-outline:hover {
+    background-color: #2b7a78;
+    color: white;
+}
+
+.btn-full {
+    width: 100%;
+}
+/* Action Buttons */
 .lost-btn {
     border-color: #e74c3c;
 }
@@ -302,4 +420,90 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+/* Dashboard main area centered */
+.dashboard-section {
+    text-align: center;
+    margin-top: 80px;
+}
+
+/* Dashboard title */
+.dashboard-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #004d4d;
+    margin-bottom: 30px;
+}
+
+/* 3 Action Cards Layout */
+.action-buttons {
+    display: flex;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 80px;
+
+}
+
+.action-btn {
+    background: #ffffff;
+    border: 2px solid #20b2aa; /* dark moderate cyan */
+    border-radius: 15px;
+    padding: 60px 50px;
+    width: 100%;
+    max-width: 280px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(32, 178, 170, 0.2);
+    text-decoration: none;
+}
+
+.action-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(32, 178, 170, 0.35);
+    background-color: #f0fffa;
+}
+
+/* Card text styles */
+.btn-content h3 {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.count {
+    font-size: 2.8rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* Lost / Found / Adopt color distinction */
+.lost-btn {
+    border-color: #e74c3c;
+}
+.found-btn {
+    border-color: #27ae60;
+}
+.adopt-btn {
+    border-color: #3498db;
+}
+
+/* Responsive layout */
+@media (max-width: 900px) {
+    .action-buttons {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (max-width: 600px) {
+    .action-buttons {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    .dashboard-title {
+        font-size: 1.6rem;
+    }
 }

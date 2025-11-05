@@ -7,42 +7,46 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
 </head>
 <body>
-    <div class="container">
-        <!-- Dashboard Header -->
-        <header class="dashboard-header">
-            <h1>Pet Admin Dashboard</h1>
-            <p>Manage pet requests and update their status</p>
-            <nav class="header-nav">
-                <a href="{{ url_for('admin_home') }}" class="btn btn-primary">← Back</a>
-            </nav>
-        </header>
-
-        <!-- Main Dashboard View -->
-        <div id="dashboard-view" class="dashboard-content">
-            <div class="action-buttons">
-                <a href="{{ url_for('admin_lost_pets') }}" class="action-btn lost-btn">
-                    <div class="btn-content">
-                        <h3>Lost</h3>
-                        <span class="count">{{ lost_count }}</span>
-                    </div>
-                </a>
-                
-                <a href="{{ url_for('admin_found_pets') }}" class="action-btn lost-btn">
-                    <div class="btn-content">
-                        <h3>Found</h3>
-                        <span class="count">{{ found_count }}</span>
-                    </div>
-                </a>
-                
-                <a href="{{ url_for('admin_adopt_pets') }}" class="action-btn lost-btn">
-                    <div class="btn-content">
-                        <h3>Adopt</h3>
-                        <span class="count">{{ adopt_count }}</span>
-                    </div>
-                </a>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🐾</span>
+                    <h1 class="logo-text">Manage Pet Requests</h1>
+                </div>
+                <nav class="header-nav">
+                <a href="{{ url_for('admin_home') }}" class="btn btn-primary">Back</a>
+                </nav>
             </div>
         </div>
+    </header>
 
+<!-- 🐾 Main Dashboard View -->
+<div class="dashboard-section">
+    <h2 class="dashboard-title">Managing Pet Requests for Approval or Rejection</h2>
+
+    <div class="action-buttons">
+        <a href="{{ url_for('admin_lost_pets') }}" class="action-btn lost-btn">
+            <div class="btn-content">
+                <h3>Lost</h3>
+                <span class="count">{{ lost_count }}</span>
+            </div>
+        </a>
+        <a href="{{ url_for('admin_found_pets') }}" class="action-btn found-btn">
+            <div class="btn-content">
+                <h3>Found</h3>
+                <span class="count">{{ found_count }}</span>
+            </div>
+        </a>
+        <a href="{{ url_for('admin_adopt_pets') }}" class="action-btn adopt-btn">
+            <div class="btn-content">
+                <h3>Adopt</h3>
+                <span class="count">{{ adopt_count }}</span>
+            </div>
+        </a>
+    </div>
+</div>
         <!-- Pet Details View -->
         <div id="details-view" class="details-content hidden">
             <div class="details-header">
