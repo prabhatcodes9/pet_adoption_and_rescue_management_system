@@ -6,3 +6,5 @@ pymysql
 flask-wtf
 Flask-Mail
 flask_apscheduler
+
+"/static/images/freepik__talk__21436-removebg-preview.png"

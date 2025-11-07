@@ -50,6 +50,9 @@ class LostPet(db.Model):
     pet_name = db.Column(db.String(100), nullable=False)
     pet_type = db.Column(db.String(50), nullable=False)
     breed = db.Column(db.String(100))
+    age = db.Column(db.String(50))
+    state = db.Column(db.String(100))
+    color = db.Column(db.String(50))
     description = db.Column(db.Text)
     last_seen_location = db.Column(db.String(255))
     date_lost = db.Column(db.Date)
@@ -70,6 +73,8 @@ class FoundPet(db.Model):
     breed = db.Column(db.String(100), nullable=True)
     description = db.Column(db.Text)
     found_location = db.Column(db.String(255))
+    state = db.Column(db.String(100))
+    color = db.Column(db.String(50))
     date_found = db.Column(db.DateTime, default=datetime.utcnow)
     date_reported = db.Column(db.DateTime, default=datetime.utcnow)
     mobile = db.Column(db.String(15))
@@ -124,6 +129,8 @@ class FoundRequest(db.Model):
     pet = db.relationship('LostPet', backref='found_requests')
 
 class ClaimRequest(db.Model):
+    __tablename__ = 'claim_request'
+
     id = db.Column(db.Integer, primary_key=True)
     pet_id = db.Column(db.Integer, db.ForeignKey('found_pet.id'), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -137,6 +144,7 @@ class ClaimRequest(db.Model):
 
     pet = db.relationship('FoundPet', backref='claim_requests')
     user = db.relationship('User', backref='claim_requests')
+    chat_rooms = db.relationship('FoundChatRoom', backref='claim_request', cascade="all, delete-orphan", passive_deletes=True)
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -165,7 +173,7 @@ class FoundChatRoom(db.Model):
     pet_id = db.Column(db.Integer, db.ForeignKey('found_pet.id'), nullable=False)
     user1_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #Pet owner
     user2_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #Claimer
-    claim_request_id = db.Column(db.Integer, db.ForeignKey('claim_request.id'))
+    claim_request_id = db.Column(db.Integer, db.ForeignKey('claim_request.id', ondelete='CASCADE'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     active = db.Column(db.Boolean, default=False)
 
@@ -1788,7 +1796,7 @@ def move_found_pets_to_adopt():
     while True:
         with app.app_context():
             now = datetime.utcnow()
-            threshold = now - timedelta(days=10)
+            threshold = now - timedelta(days=15)
 
             old_pets = FoundPet.query.filter(
                 FoundPet.date_reported < threshold,

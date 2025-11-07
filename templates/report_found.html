@@ -26,32 +26,39 @@
             </div>
         </div>
     </header>
-    <!-- Report a Found -->
-     <div id="foundModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>🐾 Report Found Pet</h2>
-        <span class="close" id="closeModal">&times;</span>
-      </div>
+<!-- Report a Lost Pet Modal -->
+<div id="foundModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>🐾 Report Found Pet</h2>
+      <span class="close" id="closeModal">&times;</span>
+    </div>
 
-      <form class="modal-form" method="POST" enctype="multipart/form-data" action="{{ url_for('report_found') }}">
+    <form class="report-form" method="POST" enctype="multipart/form-data" action="{{ url_for('report_found') }}">
+      <div class="form-grid">
+
         <div class="form-group">
           <label for="pet_name">Pet Name</label>
           <input type="text" id="pet_name" name="pet_name" placeholder="Enter pet name" required>
         </div>
 
         <div class="form-group">
-          <label for="pet_type">Pet Type</label>
+          <label for="pet_type">Type (e.g. Dog, Cat, Other)</label>
           <input type="text" id="pet_type" name="pet_type" placeholder="Dog, Cat, etc." required>
         </div>
 
         <div class="form-group">
           <label for="breed">Breed</label>
-          <input type="text" id="breed" name="breed" placeholder="Enter breed" required>
+          <input type="text" id="breed" name="breed" placeholder="Enter breed">
         </div>
 
         <div class="form-group">
-          <label for="gender">Gender</label>
+          <label for="color">Color</label>
+          <input type="text" id="color" name="color" placeholder="Enter color">
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Pet Gender</label>
           <select id="gender" name="gender" required>
             <option value="">Select Gender</option>
             <option value="Male">Male</option>
@@ -61,36 +68,38 @@
         </div>
 
         <div class="form-group">
-          <label for="last_seen_location">Found Location</label>
-          <input type="text" id="found_location" name="found_location" placeholder="Enter location" required>
-        </div>
-
-        <div class="form-group">
-          <label for="date_lost">Date Found</label>
+          <label for="date_lost">Date When Pet Was Found</label>
           <input type="date" id="date_found" name="date_found" required>
         </div>
 
         <div class="form-group">
+          <label for="state">State</label>
+          <input type="text" id="state" name="state" placeholder="Enter state">
+        </div>
+
+        <div class="form-group">
+          <label for="last_seen_location">Found Location</label>
+          <input type="text" id="found_location" name="found_location" placeholder="Enter detailed location" required>
+        </div>
+
+        <div class="form-group full-width">
           <label for="description">Description</label>
-          <textarea id="description" name="description" placeholder="Describe your pet..." rows="4" required></textarea>
+          <textarea id="description" name="description" placeholder="Provide additional details about pet..." rows="1" required></textarea>
         </div>
 
-        <div class="form-group">
-          <label for="contact">Contact Number</label>
-          <input type="tel" id="mobile" name="mobile" placeholder="Enter contact number" required>
-        </div>
-
-        <div class="form-group">
-          <label for="image">Upload Pet Image</label>
+        <div class="form-group full-width">
+          <label for="image">Upload Pet Image (JPG/PNG)</label>
           <input type="file" id="image" name="image" accept="uploads/" required>
         </div>
+      </div>
 
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary btn-full">Submit Report</button>
-        </div>
-      </form>
-    </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary1">Submit Report</button>
+      </div>
+    </form>
   </div>
+</div>
+
 
   <!-- That's My Pet Modal -->
   <div id="thatsMyPetModal" class="modal">
